@@ -56,7 +56,7 @@ Desenvolver uma versão do sistema capaz de cadastrar, consultar e gerenciar reg
 | 7 |  Alta |  Como Supervisor de Vendas, quero visualizar a trilha de decisão de uma regra para entender como o sistema chegou naquele resultado. |  3  |
 | 8 | Média |  Como Supervisor de Vendas, quero gerar um relatório final referente à campanha para visualizar o real impacto financeiro| 3 |
 | 9 | Média | Como Supervisor de Vendas, quero visualizar gráficos e insights ao final da campanha para entender os resultados e realizar comparações |  3     |
-| 10 |  Baixa| Como Supervisor de Vendas, quero visualizar as campanhas já realizadas, em andamento e previstas, para gerenciamento.  |   4    |
+| 10 |  Baixa| Como Supervisor de Vendas, quero visualizar as campanhas já realizadas, em andamento e previstas, para gerenciamento.  |   3    |
 
 <!--
 ## :bomb: DoR - Definition of Ready <a id="dor"></a>
@@ -97,12 +97,6 @@ Desenvolver uma versão do sistema capaz de cadastrar, consultar e gerenciar reg
 <th> <img src = ""> </th>
 <th> <img src = ""> </th>
 </tr> <tr>
-<td> <img src = ""></td>
-<td> <img src =""> </td>
-<td> <img src = ""> </td>
-<td> <img src = ""> </td>
-  </tr>
-</table> -->
 </div>
 
 ## 🎥 Demonstração
@@ -153,7 +147,7 @@ Desenvolver uma versão do sistema capaz de cadastrar, consultar e gerenciar reg
 
 ## 📖 Guia de Documentações <a id="manual"></a>
 
-[Documentação Técnica](/docs)
+[Documentação Técnica](/documentation)
 
 ## Pavio Cutters:
 
