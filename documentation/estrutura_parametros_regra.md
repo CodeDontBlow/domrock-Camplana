@@ -6,15 +6,15 @@ Documentação de contrato de dados entre Frontend, Backend e Agente de IA para 
 
 ## 1. Dicionário de Metadados
 
-| Campo (key) | Rótulo (label) | Tipo (type) | Valores Aceitos |
-| :--- | :--- | :--- | :--- |
-| `periodo` | Prazo da Campanha | `date_range` | Formato `YYYY-MM-DD` |
-| `pct_acrescimo` | Acréscimo de Comissão (%) | `percentage` | Decimal (ex: `1.0` = +1%) |
-| `marcas_alvo` | Marcas Participantes | `multi_select` | Tabela marca (`10`, `20`, `30`, `40`, `50`, `60`, `ALL`) |
-| `cargos_alvo` | Cargos Elegíveis | `multi_select` | Tabela cargo (`100`, `150_LOJA`, `150_QUIOSQUE`, `200`, `300`) |
-| `canal` | Canal de Venda | `select` | `TODOS`, `LOJA`, `BALCAO` |
-| `meta_vendas` | Meta Financeira (R$) | `currency` | Valor monetário em R$ |
-| `orcamento_limite` | Orçamento Máximo (R$) | `currency` | Teto financeiro em R$ |
+| Campo (key) | Rótulo (label) | Tipo (type) | Categoria | Valores Aceitos |
+| :--- | :--- | :--- | :--- | :--- |
+| `tipo_regra` | Tipo da Regra | `select` | - | Identifica o tipo de regra (ex: `BONUS_TEMPORARIO`) |
+| `periodo` | Prazo da Campanha | `date_range` | REGRA | Formato `YYYY-MM-DD` |
+| `pct_acrescimo` | Acréscimo de Comissão (%) | `percentage` | REGRA | Decimal (ex: `1.0` = +1%) |
+| `marcas_alvo` | Marcas Participantes | `multi_select` | REGRA | Tabela marca (`10`, `20`, `30`, `40`, `50`, `60`, `ALL`) |
+| `cargos_alvo` | Cargos Elegíveis | `multi_select` | REGRA | Tabela cargo (`100`, `150`, `200`, `300`) |
+| `meta_vendas` | Meta Financeira (R$) | `currency` | CONSTRAINT | Valor monetário em R$ |
+| `orcamento_limite` | Orçamento Máximo (R$) | `currency` | CONSTRAINT | Teto financeiro em R$ |
 
 ---
 
@@ -23,13 +23,15 @@ Documentação de contrato de dados entre Frontend, Backend e Agente de IA para 
 ```json
 {
   "rule_id": "draft-bf-2025-11",
+  "tipo_regra": "BONUS_TEMPORARIO",
   "raw_prompt": "Todas as vendas no período de 24/11 a 30/11 terão um acréscimo no % de comissão de +1%.",
   "status": "DRAFT_PENDING_REVIEW",
-  "rule_parameters": [
+  "parametros": [
     {
       "key": "periodo",
       "label": "Prazo da Campanha",
       "type": "date_range",
+      "categoria": "REGRA",
       "value": {
         "data_inicio": "2025-11-24",
         "data_fim": "2025-11-30"
@@ -40,6 +42,7 @@ Documentação de contrato de dados entre Frontend, Backend e Agente de IA para 
       "key": "pct_acrescimo",
       "label": "Acréscimo de Comissão (%)",
       "type": "percentage",
+      "categoria": "REGRA",
       "value": 1.0,
       "required": true
     },
@@ -47,6 +50,7 @@ Documentação de contrato de dados entre Frontend, Backend e Agente de IA para 
       "key": "marcas_alvo",
       "label": "Marcas Participantes",
       "type": "multi_select",
+      "categoria": "REGRA",
       "value": ["ALL"],
       "options": [
         { "id": "ALL", "label": "Todas as Marcas" },
@@ -63,34 +67,21 @@ Documentação de contrato de dados entre Frontend, Backend e Agente de IA para 
       "key": "cargos_alvo",
       "label": "Cargos Elegíveis",
       "type": "multi_select",
+      "categoria": "REGRA",
       "value": ["100", "200", "300"],
       "options": [
         { "id": "100", "label": "VENDEDOR LOJA" },
-        { "id": "150_LOJA", "label": "GERENTE DE LOJA" },
-        { "id": "150_QUIOSQUE", "label": "GERENTE QUIOSQUE" },
+        { "id": "150", "label": "GERENTE" },
         { "id": "200", "label": "VENDEDOR BALCAO" },
         { "id": "300", "label": "ASSISTENTE DE VENDAS" }
       ],
       "required": true
     },
     {
-      "key": "canal",
-      "label": "Canal de Venda",
-      "type": "select",
-      "value": "TODOS",
-      "options": [
-        { "id": "TODOS", "label": "Todos os Canais" },
-        { "id": "LOJA", "label": "Loja Física" },
-        { "id": "BALCAO", "label": "Balcão" }
-      ],
-      "required": true
-    }
-  ],
-  "simulation_constraints": [
-    {
       "key": "meta_vendas",
       "label": "Meta Financeira da Campanha (R$)",
       "type": "currency",
+      "categoria": "CONSTRAINT",
       "value": null,
       "required": true
     },
@@ -98,8 +89,10 @@ Documentação de contrato de dados entre Frontend, Backend e Agente de IA para 
       "key": "orcamento_limite",
       "label": "Orçamento Máximo de Incentivo (R$)",
       "type": "currency",
+      "categoria": "CONSTRAINT",
       "value": null,
       "required": true
     }
   ]
 }
+```
