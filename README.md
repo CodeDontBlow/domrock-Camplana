@@ -200,7 +200,7 @@ Não é preciso instalar Java, Node ou Python: tudo roda em containers.
 ### 1. Clonar com os submódulos
 
 ```bash
-git clone --recurse-submodules https://github.com/codedontblow-org/domrock-camplana
+git clone --recurse-submodules https://github.com/codedontblow/domrock-camplana
 cd domrock-camplana
 git submodule update --init --remote   # garante a branch develop
 ```

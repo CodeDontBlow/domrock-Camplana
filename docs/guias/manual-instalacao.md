@@ -71,7 +71,7 @@ docker compose version
 Clone o repositório principal e baixe o código dos submódulos na branch `develop`:
 
 ```bash
-git clone https://github.com/codedontblow-org/domrock-camplana.git
+git clone https://github.com/codedontblow/domrock-camplana.git
 cd domrock-camplana
 
 # Inicializa e atualiza os submódulos (Backend, Frontend e Lana)
