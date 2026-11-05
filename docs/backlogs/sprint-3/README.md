@@ -28,7 +28,7 @@ Ao mesmo tempo, a apuração ainda não aplica todas as regras da especificaçã
 
 | Capacidade estimada | Meta da Sprint | Previsão (extras) |
 | :--: | :--: | :-- |
-| 40 | User stories de rank 1, 2 e 3 (IDs 19, 20 e 21) — 34 pontos | User stories de rank 4 a 7 (IDs 22, 16, 23 e 24) — 23 pontos |
+| 40 | User stories de rank 1, 2 e 3 (IDs 19, 20 e 21) — 34 pontos | User stories de rank 4 a 6 (IDs 9, 22 e 16) — 21 pontos |
 
 **Período:** 02/11/2026 a 23/11/2026, com 3 semanas, como as Sprints 1 (07/09 a 27/09) e 2 (05/10 a 26/10). A capacidade considera a velocidade das sprints anteriores e reserva tempo para os manuais e o vídeo da entrega final.
 
@@ -43,7 +43,7 @@ Ao mesmo tempo, a apuração ainda não aplica todas as regras da especificaçã
 | Validação humana obrigatória | Mantida: a aprovação continua exigindo outra pessoa, e o Auditor não aprova |
 | Logs consolidados e explicabilidade | Conversa, trilha, versões e decisões reunidas numa tela por campanha (US 19 e 20) |
 
-O mapa completo, incluindo as notas do time, está em [backlog.md](backlog.md#rastreabilidade).
+O mapa completo está em [backlog.md](backlog.md#rastreabilidade).
 
 ## Backlog da Sprint <a id="backlog"></a>
 
@@ -52,20 +52,19 @@ O mapa completo, incluindo as notas do time, está em [backlog.md](backlog.md#ra
 | 1 | 19 | Must | Como Auditor, quero consultar, sem poder alterar, as campanhas, versões, conversas e decisões de todos os usuários, para auditar o negócio de ponta a ponta. | 8 |
 | 2 | 20 | Must | Como Auditor, quero ver o SQL e o código gerados pela Lana e resolver os alertas de segurança, para que nenhuma campanha com código suspeito seja aprovada. | 13 |
 | 3 | 21 | Must | Como Gerente de Vendas, quero que a apuração siga todas as regras da especificação e as intercorrências de RH, para que o simulado bata com o que a empresa pagaria. | 13 |
-| 4 | 22 | Should | Como Gerente ou Supervisor de Vendas, quero registrar intercorrências de RH e correções da base por uma tela, com aprovação de outra pessoa, para que a apuração use a base certa. | 8 |
-| 5 | 16 | Should | Como Supervisor de Vendas, quero visualizar as campanhas já realizadas, em andamento e previstas, para gerenciá-las. | 5 |
-| 6 | 23 | Should | Como Gerente de Vendas, quero ver no chat o histórico das minhas ações e ter o nome e o compartilhar da campanha acima da conversa, para acompanhar a campanha sem sair do chat. | 5 |
-| 7 | 24 | Should | Como Gerente, Supervisor ou Auditor, quero uma navegação de acordo com o meu perfil, para encontrar o que preciso sem me perder. | 5 |
+| 4 | 9 | Should | Como Supervisor de Vendas, quero propor correções pontuais na base cadastral e submetê-las ao mesmo fluxo de aprovação, para manter a base íntegra caso haja necessidade. | 8 |
+| 5 | 22 | Should | Como Gerente ou Supervisor de Vendas, quero registrar intercorrências de RH conversando com a Lana, com aprovação de outra pessoa, para que a apuração use a base certa. | 8 |
+| 6 | 16 | Should | Como Supervisor de Vendas, quero visualizar as campanhas já realizadas, em andamento e previstas, para gerenciá-las. | 5 |
 
-Tarefas técnicas da sprint (sem pontos de história): spike de RAG para a Lana conversável (T1), filtro do SQL por perfil no backend (T2), sandbox dedicado (T3), divisão da ferramenta de simulação (T4), renumeração da migration da correção da base (T5) e manuais e vídeo finais (T7). Detalhes em [backlog.md](backlog.md#sprint).
+Tarefas técnicas da sprint (sem pontos de história): spike de RAG para a Lana conversável (T1), filtro do SQL por perfil no backend (T2), sandbox dedicado (T3), divisão da ferramenta de simulação (T4), renumeração da migration da correção da base (T5), manuais e vídeo finais (T7) e correção do item ativo da barra lateral (T8). Detalhes em [backlog.md](backlog.md#sprint).
 
 ## 🧭 Priorização MoSCoW <a id="moscow"></a>
 
 | Must have | Should have | Could have | Won't have |
 | :-- | :-- | :-- | :-- |
-| 19 Auditor: negócio<br>20 Auditor: técnica e alertas<br>21 Apuração completa | 22 Intercorrências pela tela<br>16 Campanhas por período<br>23 Eventos no chat<br>24 Navegação por perfil<br>Tarefas T1 a T5 | 25 Lana conversável (RAG)<br>T6 Cores de sucesso | Relatório com gráficos e insights<br>Notificação de submissão<br>Comissão fora da média<br>Perfil e troca de senha<br>Custo na meta e campanha futura<br>Cancelar campanha aprovada<br>Logs no Grafana e entrada por voz |
+| 19 Auditor: negócio<br>20 Auditor: técnica e alertas<br>21 Apuração completa | 9 Correção da base pela Lana<br>22 Intercorrências pela Lana<br>16 Campanhas por período<br>Tarefas T1 a T5 e T8 | 25 Lana conversável (RAG)<br>T6 Cores de sucesso | Relatório com gráficos e insights<br>Notificação de submissão<br>Comissão fora da média<br>Perfil e troca de senha<br>Custo na meta e campanha futura<br>Cancelar campanha aprovada<br>Eventos no chat e navegação por perfil<br>Logs no Grafana e entrada por voz |
 
-O porquê de cada categoria está em [backlog.md](backlog.md#moscow). O backlog do produto foi enxugado em 04/11/2026 para 19 histórias, das quais 11 já foram entregues. O relatório com gráficos saiu por decisão do PO: a sprint prioriza a apuração correta e a auditoria.
+O porquê de cada categoria está em [backlog.md](backlog.md#moscow). O relatório com gráficos saiu por decisão do PO: a sprint prioriza a apuração correta e a auditoria.
 
 ## 🧪 Critérios de aceitação <a id="bdd"></a>
 
@@ -76,10 +75,9 @@ Todos os cenários estão em [gherkin.md](gherkin.md), escritos com os usuários
 | [19 — Auditor: negócio](gherkin.md#us19) | 9 | Só leitura com 403 nas rotas de escrita; versões comparadas; decisão com justificativa |
 | [20 — Auditor: técnica e alertas](gherkin.md#us20) | 10 | Injeção de prompt e de SQL bloqueadas e registradas; alerta trava a aprovação |
 | [21 — Apuração completa](gherkin.md#us21) | 11 | Uma regra por cenário (5a a 5g) com os exemplos da especificação |
-| [22 — Intercorrências pela tela](gherkin.md#us22) | 7 | Cinco tipos de intercorrência; quatro olhos; base alterada desde o pedido (409) |
+| [9 — Correção da base pela Lana](gherkin.md#us9) | 8 | Pedido pelo chat com antes e depois; quatro olhos; base alterada desde o pedido (409) |
+| [22 — Intercorrências pela Lana](gherkin.md#us22) | 6 | Cinco tipos de intercorrência; confirmação antes de submeter; datas inválidas recusadas |
 | [16 — Campanhas por período](gherkin.md#us16) | 4 | Classificação pela data de hoje |
-| [23 — Eventos no chat](gherkin.md#us23) | 5 | Eventos ficam na conversa e não gastam token da Lana |
-| [24 — Navegação por perfil](gherkin.md#us24) | 5 | Tela inicial por perfil; item ativo depois do F5 |
 | [25 — Lana conversável](gherkin.md#us25) | 4 | Fallback sem chamar a LLM; limiar configurável |
 
 ## 🏅 DoR — Definition of Ready <a id="dor"></a>
@@ -120,20 +118,21 @@ Critérios utilizados para verificar se uma história foi desenvolvida, testada 
 - Rotas de leitura para o Auditor e 403 em todas as rotas de escrita (US 19).
 - SQL e código gerados devolvidos só para Supervisor e Auditor (T2).
 - Alertas técnicos: tabela, rotas de abrir e resolver, e trava na decisão da versão (US 20).
+- Correção da base com aprovação de outra pessoa: PR da A6-80 com a migration renumerada (US 9 e T5).
 - Intercorrências com o mesmo fluxo de aprovação da correção da base (US 22).
-- Campanhas por período e eventos de ação gravados na conversa (US 16 e 23).
+- Campanhas por período (US 16).
 
 ### Frontend (Vue 3, Vite, Pinia)
 - Tela "Auditoria" com abas de negócio (versões, decisões, conversa) e técnica (SQL, código, alertas) (US 19 e 20).
-- Tela de intercorrências e correções da base (US 22).
+- Pedidos de correção da base e de intercorrência na fila de Aprovações (US 9 e 22).
+- Item ativo da barra lateral de acordo com a rota, também depois do F5 (T8).
 - Abas realizadas, em andamento e previstas em "Campanhas" (US 16).
-- Barra acima do chat com nome e compartilhar, e eventos na conversa (US 23).
-- Navegação e tela inicial por perfil, item ativo pela rota e "Novo chat" limpo (US 24).
 
 ### Lana (Python, FastAPI, gRPC, LangGraph)
 - Consultas bloqueadas pela checagem de SQL gravadas na trilha, com o motivo (US 20).
 - Análise do código Python gerado antes de executar (US 20).
 - Apuração com as regras 5a a 5g e as intercorrências, com o detalhamento por pessoa (US 21).
+- Pedido de correção da base e de intercorrência pelo chat, com confirmação antes de submeter (US 9 e 22).
 - Ferramenta de simulação dividida em partes menores (T4).
 - Spike de RAG: banco vetorial, limiar e fallback (T1).
 
@@ -145,11 +144,11 @@ Critérios utilizados para verificar se uma história foi desenvolvida, testada 
 
 | Risco | Impacto | Como tratar |
 | :-- | :-- | :-- |
-| A apuração completa (21) é a história mais pesada e depende de dados de intercorrência | Atraso na meta | Começar pelas regras com exemplo da especificação; intercorrências registradas pela tela (22) entram depois |
+| A apuração completa (21) é a história mais pesada e depende de dados de intercorrência | Atraso na meta | Começar pelas regras com exemplo da especificação; intercorrências registradas pela Lana (22) entram depois |
 | Alertas demais travam a aprovação na demo | Demo emperrada | Só bloqueios reais e código suspeito abrem alerta; o Auditor resolve com justificativa |
 | Status do sandbox (A6-85) incerto | Risco de segurança e de pergunta na review | Confirmar no início da sprint (T3) |
 | O spike de RAG cresce além do prazo | Tira capacidade das Must | Prazo fixo de 3 dias; a história 25 só entra se o spike aprovar |
-| Última sprint, com manuais e vídeo na mesma janela | Falta de tempo no fim | Capacidade de 40 pontos, abaixo do total Must + Should (57) |
+| Última sprint, com manuais e vídeo na mesma janela | Falta de tempo no fim | Capacidade de 40 pontos, abaixo do total Must + Should (55) |
 
 ## 📚 Documentação do projeto <a id="docs"></a>
 

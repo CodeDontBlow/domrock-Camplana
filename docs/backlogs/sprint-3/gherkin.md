@@ -13,7 +13,7 @@ Cada história traz as **regras** que valem para todos os cenários e os **cená
 
 Campanhas do seed citadas: "Black Friday 2025", "Campanha Outubro - Dia das Crianças", "Campanha Fim de Ano - Rascunho" e "Campanha de Inverno - Julho 2025".
 
-**Sumário:** [19 — Auditor: negócio](#us19) · [20 — Auditor: técnica e alertas](#us20) · [21 — Apuração completa](#us21) · [22 — Intercorrências e correções pela tela](#us22) · [16 — Campanhas por período](#us16) · [23 — Eventos no chat](#us23) · [24 — Navegação por perfil](#us24) · [25 — Lana conversável](#us25)
+**Sumário:** [19 — Auditor: negócio](#us19) · [20 — Auditor: técnica e alertas](#us20) · [21 — Apuração completa](#us21) · [9 — Correção da base pela Lana](#us9) · [22 — Intercorrências de RH pela Lana](#us22) · [16 — Campanhas por período](#us16) · [25 — Lana conversável](#us25)
 
 ---
 
@@ -281,7 +281,7 @@ Funcionalidade: Apuração completa da comissão
     E o detalhamento cita a intercorrência e as datas
 
   Cenário: Intercorrência pendente de aprovação não entra na apuração
-    Dado que a Gabriela registrou férias para a MATRIC-42 pela tela
+    Dado que a Gabriela registrou férias para a MATRIC-42 pela Lana
     E que o pedido ainda está "Pendente"
     Quando a apuração é executada
     Então as férias pendentes não são consideradas
@@ -295,36 +295,88 @@ Funcionalidade: Apuração completa da comissão
 
 ---
 
-## US 22 — Intercorrências e correções da base pela tela <a id="us22"></a>
+## US 9 — Correção da base pela Lana <a id="us9"></a>
 
-> Como Gerente ou Supervisor de Vendas, quero registrar intercorrências de RH e correções da base por uma tela, com aprovação de outra pessoa, para que a apuração use a base certa.
+> Como Supervisor de Vendas, quero propor correções pontuais na base cadastral e submetê-las ao mesmo fluxo de aprovação, para manter a base íntegra caso haja necessidade.
 
 **Regras**
-- Tipos de intercorrência: `afastamento`, `ferias`, `licenca_maternidade`, `cobertura_loja` e `demissao`.
-- Todo registro nasce "Pendente" e só vale depois de aprovado por **outra pessoa** (Supervisor).
-- A correção da base guarda o valor antes e o valor depois. Se a base mudou desde o pedido, a aprovação é recusada (409).
-- O backend da correção já existe (A6-80); esta história entrega a tela e as intercorrências.
+- O pedido é feito no chat. A Lana confere a matrícula na base e mostra o valor antes, o valor depois, o mês e o motivo para o usuário confirmar antes de submeter.
+- A Lana não altera a base: ela só cria o pedido. A base muda quando outra pessoa aprova.
+- Dá para corrigir loja, cargo, data de admissão e data de demissão.
+- Todo pedido nasce "Pendente" e só vale depois de aprovado por **outra pessoa** (Supervisor), na fila de Aprovações.
+- Se a base mudou desde o pedido, a aprovação é recusada (409).
 
 ```gherkin
 # language: pt
-Funcionalidade: Intercorrências e correções da base pela interface
+Funcionalidade: Correção da base pela Lana
 
-  Cenário: Gerente pede transferência de loja
-    Dado que a Gabriela está logada
-    Quando ela pede para mover a MATRIC-38 da loja 5 para a loja 8 em out/2025, com o motivo "Transferência em 01/10"
-    Então o pedido nasce "Pendente" com antes "loja 5", depois "loja 8" e autora "Gabriela"
+  Cenário: Supervisor pede transferência de loja pela Lana
+    Dado que o Sérgio está no chat
+    Quando ele escreve "a MATRIC-38 foi transferida da loja 5 para a loja 8 em out/2025"
+    Então a Lana mostra a matrícula, a loja antes, a loja depois, o mês e o motivo para ele confirmar
+    E, depois que ele confirma, o pedido nasce "Pendente" com antes "loja 5", depois "loja 8" e autor "Sérgio"
 
-  Cenário: Supervisor aprova e a base muda
-    Dado que existe o pedido pendente da MATRIC-38 para a loja 8
-    Quando o Sérgio aprova o pedido
+  Cenário: Outro Supervisor aprova e a base muda
+    Dado que existe o pedido pendente do Sérgio para mover a MATRIC-38 para a loja 8
+    Quando a Silvia aprova o pedido na fila de Aprovações
     Então em out/2025 a MATRIC-38 passa a pertencer à loja 8
-    E o pedido fica "Aprovado" com o aprovador e a data
+    E o pedido fica "Aprovado" com a aprovadora e a data
 
-  Esquema do Cenário: Registrar intercorrência de RH
-    Dado que a Gabriela está na tela "Intercorrências"
-    Quando ela registra "<tipo>" para a "<matricula>" de "<inicio>" a "<fim>"
-    Então o registro nasce "Pendente"
-    E aparece na fila do Supervisor
+  Cenário: Pedido sem o mês
+    Quando o Sérgio escreve "a MATRIC-38 foi transferida da loja 5 para a loja 8"
+    Então a Lana pergunta em que mês a correção vale
+    E nenhum pedido é criado
+
+  Cenário: Valor antes não confere com a base
+    Dado que em out/2025 a MATRIC-38 está na loja 7
+    Quando o Sérgio pede para mover a MATRIC-38 da loja 5 para a loja 8 em out/2025
+    Então a Lana avisa que a MATRIC-38 está na loja 7 naquele mês
+    E nenhum pedido é criado
+
+  Cenário: Pedido que não é correção da base
+    Quando o Sérgio escreve "aumente a % do gerente da marca 10"
+    Então a Lana não abre pedido e explica que isso é uma campanha
+
+  Cenário: Autor não aprova o próprio pedido
+    Dado que o Sérgio abriu um pedido de correção
+    Quando o próprio Sérgio tenta aprová-lo
+    Então a resposta é 403 com a mensagem "Outra pessoa precisa aprovar esta correção"
+
+  Cenário: Base mudou desde o pedido
+    Dado que o Sérgio pediu para mover a MATRIC-38 da loja 5 para a loja 8
+    E que, antes da decisão, outra correção já moveu a MATRIC-38 para a loja 9
+    Quando a Silvia tenta aprovar o pedido do Sérgio
+    Então a resposta é 409 com a mensagem "A base mudou desde o pedido"
+
+  Cenário: Reprovar exige justificativa
+    Dado que existe um pedido de correção pendente
+    Quando a Silvia tenta reprová-lo sem justificativa
+    Então o sistema recusa e pede a justificativa
+    E a base não é alterada
+```
+
+---
+
+## US 22 — Intercorrências de RH pela Lana <a id="us22"></a>
+
+> Como Gerente ou Supervisor de Vendas, quero registrar intercorrências de RH conversando com a Lana, com aprovação de outra pessoa, para que a apuração use a base certa.
+
+**Regras**
+- O pedido é feito no chat. A Lana extrai o tipo, a matrícula, o período e o motivo (e a loja, na cobertura) e mostra tudo para o usuário confirmar antes de submeter.
+- A Lana não altera a base: ela só cria o pedido.
+- Tipos de intercorrência: `afastamento`, `ferias`, `licenca_maternidade`, `cobertura_loja` e `demissao`.
+- Usa o mesmo fluxo de aprovação da correção da base (US 9): o pedido nasce "Pendente" e só vale depois de aprovado por **outra pessoa** (Supervisor), na fila de Aprovações.
+
+```gherkin
+# language: pt
+Funcionalidade: Intercorrências de RH pela Lana
+
+  Esquema do Cenário: Registrar intercorrência de RH pela Lana
+    Dado que a Gabriela está no chat
+    Quando ela pede à Lana para registrar "<tipo>" para a "<matricula>" de "<inicio>" a "<fim>"
+    Então a Lana mostra o tipo, a matrícula e o período para ela confirmar
+    E, depois que ela confirma, o registro nasce "Pendente"
+    E aparece na fila de Aprovações do Supervisor
 
     Exemplos:
       | tipo                 | matricula | inicio     | fim        |
@@ -334,26 +386,31 @@ Funcionalidade: Intercorrências e correções da base pela interface
       | cobertura_loja       | MATRIC-20 | 05/11/2025 | 20/11/2025 |
       | demissao             | MATRIC-31 | 10/11/2025 | 10/11/2025 |
 
+  Cenário: Supervisor aprova e a intercorrência passa a valer
+    Dado que existe o pedido pendente de férias da MATRIC-42 de 01/10/2025 a 10/10/2025
+    Quando o Sérgio aprova o pedido na fila de Aprovações
+    Então as férias passam a valer para a apuração
+    E o pedido fica "Aprovado" com o aprovador e a data
+
+  Cenário: Pedido sem a matrícula
+    Quando a Gabriela escreve "registrar férias de 01/10/2025 a 10/10/2025"
+    Então a Lana pergunta qual é a matrícula
+    E nenhum pedido é criado
+
+  Cenário: Usuário desiste na confirmação
+    Dado que a Lana mostrou o pedido de férias da MATRIC-42 para a Gabriela confirmar
+    Quando a Gabriela cancela
+    Então nenhum pedido é criado
+
+  Cenário: Datas inválidas são recusadas pela Lana
+    Quando a Gabriela pede à Lana férias para a MATRIC-42 com início em 10/10/2025 e fim em 01/10/2025
+    Então a Lana responde "A data final precisa ser igual ou posterior à inicial"
+    E nenhum pedido é criado
+
   Cenário: Autor não aprova o próprio pedido
-    Dado que o Sérgio registrou um afastamento
+    Dado que o Sérgio registrou um afastamento pela Lana
     Quando o próprio Sérgio tenta aprová-lo
     Então a resposta é 403 com a mensagem "Outra pessoa precisa aprovar esta correção"
-
-  Cenário: Base mudou desde o pedido
-    Dado que a Gabriela pediu para mover a MATRIC-38 da loja 5 para a loja 8
-    E que, antes da decisão, outra correção já moveu a MATRIC-38 para a loja 9
-    Quando o Sérgio tenta aprovar o pedido da Gabriela
-    Então a resposta é 409 com a mensagem "A base mudou desde o pedido"
-
-  Cenário: Datas inválidas são recusadas na tela
-    Quando a Gabriela registra férias com início em 10/10/2025 e fim em 01/10/2025
-    Então a tela mostra "A data final precisa ser igual ou posterior à inicial" e não envia o pedido
-
-  Cenário: Reprovar exige justificativa
-    Dado que existe um pedido pendente
-    Quando a Silvia tenta reprová-lo sem justificativa
-    Então o sistema recusa e pede a justificativa
-    E a base não é alterada
 ```
 
 ---
@@ -396,96 +453,6 @@ Funcionalidade: Campanhas por período
     Dado que duas campanhas aprovadas atingem a marca 10 no mesmo período
     Quando o Sérgio abre a aba "Em andamento"
     Então as duas aparecem com o aviso de sobreposição
-```
-
----
-
-## US 23 — Eventos das ações no chat e barra da campanha <a id="us23"></a>
-
-> Como Gerente de Vendas, quero ver no chat o histórico das minhas ações e ter o nome e o compartilhar da campanha acima da conversa, para acompanhar a campanha sem sair do chat.
-
-**Regras**
-- Eventos são mensagens de sistema gravadas na conversa, com autor e horário.
-- Eventos **não** são enviados à Lana como fala do usuário (não gastam token).
-- A barra acima do chat mostra o nome da campanha (editável pelo autor) e o botão "Compartilhar com os supervisores".
-
-```gherkin
-# language: pt
-Funcionalidade: Histórico de ações dentro do chat
-
-  Esquema do Cenário: Ação do usuário vira evento no chat
-    Dado que a Gabriela está na conversa da campanha "Black Friday 2025"
-    Quando ela "<acao>"
-    Então aparece no chat o evento "<evento>" com o horário
-
-    Exemplos:
-      | acao                                  | evento                                              |
-      | pede uma simulação                    | Gabriela pediu uma simulação                        |
-      | compartilha com os supervisores       | Gabriela compartilhou a campanha com os supervisores |
-      | submete a versão 2 para aprovação     | Gabriela submeteu a versão 2 para aprovação         |
-
-  Cenário: Renomear pela barra acima do chat
-    Quando a Gabriela muda o nome na barra para "Black Friday 2025 - Eletro"
-    Então o nome muda na barra, na lista de campanhas e na barra lateral
-    E aparece o evento "Gabriela renomeou a campanha para Black Friday 2025 - Eletro"
-
-  Cenário: Decisão do Supervisor aparece na conversa
-    Dado que o Sérgio aprovou a versão 2
-    Quando a Gabriela reabre a conversa
-    Então aparece o evento "Sérgio aprovou a versão 2" com a justificativa
-
-  Cenário: Eventos não vão para a Lana
-    Dado que a conversa tem 3 eventos e 6 mensagens
-    Quando a Gabriela envia uma nova mensagem
-    Então o histórico enviado à Lana contém só as 6 mensagens e a nova
-    E não contém os eventos
-
-  Cenário: Supervisor não renomeia campanha de outra pessoa
-    Dado que o Sérgio abre a campanha da Gabriela
-    Então o nome na barra aparece sem a opção de editar
-```
-
----
-
-## US 24 — Navegação por perfil <a id="us24"></a>
-
-> Como Gerente, Supervisor ou Auditor, quero uma navegação de acordo com o meu perfil, para encontrar o que preciso sem me perder.
-
-```gherkin
-# language: pt
-Funcionalidade: Navegação de acordo com o perfil
-
-  Esquema do Cenário: Tela inicial por perfil
-    Quando "<usuario>" faz login
-    Então a tela inicial é "<tela>"
-    E a barra lateral tem "<itens>"
-
-    Exemplos:
-      | usuario                  | tela          | itens                                         |
-      | gabriela@camplana.com.br | Novo chat     | Novo chat, Suas campanhas                     |
-      | sergio@camplana.com.br   | Aprovações    | Aprovações, Campanhas, Intercorrências        |
-      | paulo@camplana.com.br    | Auditoria     | Auditoria, Campanhas                          |
-      | ana@camplana.com.br      | Usuários      | Usuários                                      |
-
-  Cenário: Supervisor não tem "Novo chat"
-    Dado que o Sérgio está logado
-    Então a barra lateral não mostra "Novo chat"
-
-  Cenário: Gerente vê as próprias campanhas na barra lateral
-    Dado que a Gabriela tem 3 campanhas
-    Então a seção "Suas campanhas" lista as 3, da mais recente para a mais antiga
-    E clicar em uma reabre a conversa dela
-
-  Cenário: Item ativo correto depois de recarregar
-    Dado que o Sérgio está na página "Campanhas"
-    Quando ele recarrega a página (F5)
-    Então o item "Campanhas" continua marcado como ativo
-    E não o item "Nova campanha"
-
-  Cenário: "Novo chat" começa sem estado anterior
-    Dado que a Gabriela está numa conversa com mensagens e parâmetros preenchidos
-    Quando ela clica em "Novo chat"
-    Então o chat abre vazio, sem mensagens, sem parâmetros e sem resultado da conversa anterior
 ```
 
 ---
