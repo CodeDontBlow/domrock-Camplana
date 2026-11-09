@@ -320,8 +320,9 @@ O que muda:
 | `comissao_periodo` | novo: % base, vigente e com a campanha, por marca × cargo e trecho | A6-74 |
 | `conflitos` | novo: campanhas que se sobrepõem a esta | A6-74 |
 | `regras_base_aplicadas`, `pessoas_no_piso` | novos | A6-77 |
+| `apuracao_por_pessoa` | novo: quanto cada pessoa recebe, com base, %, regras aplicadas e valores finais | A6-77 |
 | `trilha` | novo (2.2) | A6-70 |
-| `ressalvas` | sai a frase "A comissão atual ainda não aplica proporcional de admissão/demissão nem férias e afastamentos." | A6-77 |
+| `ressalvas` | a frase "A comissão atual ainda não aplica proporcional de admissão/demissão nem férias e afastamentos." vira "Admissão e demissão no mês (regras 5c e 5d) já entram na apuração; férias e afastamentos (5e a 5g) entram quando as intercorrências de RH forem carregadas." | A6-77 |
 
 **Exemplo 1: meta, retorno e regras base.** Black Friday +1% de 24 a 30/11/2025, todas as marcas, exceto gerentes, meta de R$ 2.000.000 e orçamento vazio. A venda real do período foi de R$ 2.406.125,93. Mostra só os campos que mudam:
 
@@ -336,23 +337,37 @@ O que muda:
   },
   "retorno": {
     "provisorio": true,
-    "custo_pct_venda": 0.99,
+    "custo_pct_venda": 0.98,
     "custo_por_real_acima_meta": 0.06
   },
   "orcamento": null,
   "regras_base_aplicadas": [
-    { "regra": "5c", "descricao": "Admissão no mês", "pessoas": 19 },
-    { "regra": "5e_5f", "descricao": "Afastamento", "pessoas": 3 },
-    { "regra": "5g", "descricao": "Férias", "pessoas": 2 }
+    { "regra": "5c", "descricao": "Admissão no mês", "pessoas": 15 }
   ],
-  "pessoas_no_piso": 3
+  "pessoas_no_piso": 0,
+  "apuracao_por_pessoa": [
+    {
+      "matricula": "MATRIC-104", "competencia": "2025-11", "cod_loja": "30", "cod_marca": "10",
+      "cod_cargo": "100", "base_calculo": 6510.8, "pct_comiss": 2.5,
+      "detalhamento": [
+        { "regra": "5a", "descricao": "5a — % da base: 2,5%" },
+        { "regra": "5c", "descricao": "5c — admissão em 13/11: 17 de 30 dias" }
+      ],
+      "comissao_atual": 92.24, "comissao_com_campanha": 92.24
+    }
+  ]
 }
 ```
 
 - `retorno` usa a conta provisória do A6-72 enquanto a Dom Rock não responde a pergunta 2: `custo_pct_venda` = custo adicional ÷ venda do período × 100; `custo_por_real_acima_meta` = custo adicional ÷ (venda − meta), `null` se a venda não passou da meta. Com `provisorio: true`, a tela mostra a etiqueta "provisório".
-- `regras_base_aplicadas` lista as regras da especificação aplicadas na comissão atual, com quantas pessoas caíram em cada uma. Regras com 0 pessoas não aparecem. Códigos: `5c` (admissão), `5d` (demissão), `5e_5f` (afastamento, inclui licença-maternidade), `5g` (férias), `bonus`, `cobertura` (gerente cobrindo outra loja). As regras 5a e 5b valem para todos e não entram na lista.
-- `pessoas_no_piso`: quantas pessoas ficaram no piso de R$ 3.500 (só quem teve afastamento).
-- As contagens são da competência nov/2025 na base (19 admissões; afastamentos e férias da especificação). O número do piso é conferido no A6-77.
+- `regras_base_aplicadas` lista as regras da especificação aplicadas na comissão atual, com quantas pessoas (matrículas distintas) caíram em cada uma. Regras com 0 pessoas não aparecem. Códigos: `5c` (admissão), `5d` (demissão), `5e_5f` (afastamento, inclui licença-maternidade) e `5g` (férias). `bonus` e `cobertura` (gerente cobrindo outra loja) ainda não são apurados. As regras 5a e 5b valem para todos e não entram na lista.
+- `pessoas_no_piso`: quantas pessoas ficaram no fixo de R$ 3.500 na comissão atual (só quem teve afastamento remunerado).
+- As contagens são da base de nov/2025: 18 admitidos em novembro na tabela `funcionario`, dos quais 15 têm loja e cargo no mês e entram na apuração. Afastamentos e férias só entram quando as intercorrências forem carregadas (A6-108); até lá, `5e_5f`, `5g` e o piso não aparecem.
+- Com as admissões (5c), a comissão atual de nov/2025 vai de R$ 480.263,24 para R$ 477.643,36, e o custo adicional desta campanha de R$ 23.736,10 para R$ 23.569,11.
+- `apuracao_por_pessoa`: uma linha por matrícula e competência, ordenada por matrícula. É a tela "Quanto cada pessoa recebe" (A6-109).
+  - `base_calculo` e `pct_comiss` são os da 5a/5b, antes dos ajustes. `comissao_atual` e `comissao_com_campanha` são os valores finais, com 5c a 5g. A soma de cada coluna é igual a `totais.baseline` e `totais.simulado`.
+  - `detalhamento`: `regra` vale `5a`, `5b`, `5c`, `5d`, `5e`, `5f`, `5g` ou `piso`; `descricao` é o texto para a tela (ex.: "5f — afastamento de 01/10 a 20/10: 20 dias, 15 remunerados", "5g — férias de 01/10 a 10/10: 10 dias sem remuneração", "piso — recebe o fixo de R$ 3.500,00 (a comissão daria R$ 600,00)").
+  - Nenhum desses campos vai para a LLM. As decisões das regras estão em `domrock-lana/docs/a6-77-apuracao-completa.md`.
 
 **Exemplo 2: % vigente e conflitos** (critério do A6-74). A % base do gerente (150) da marca 10 é 1,00%. Valem a campanha da especificação nov/25 item 5g (gerentes +0,5% de 24 a 30/11/2025, todas as marcas) e as aprovadas Campanha A (+1,0%, de 20 a 30/11/2025) e Campanha B (+0,5%, de 25/11 a 05/12/2025). Gabriela simula +0,5% de 24 a 30/11 para a marca 10, cargo 150:
 
