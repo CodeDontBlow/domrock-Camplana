@@ -1,0 +1,20 @@
+module "camplana" {
+  source = "../../modules/camplana_stack"
+
+  environment = "prod"
+  image_tag   = "main"
+  git_branch  = "main"
+  render_plan = "free"
+
+  lana_db_password            = var.lana_db_password
+  jwt_secret                  = var.jwt_secret
+  ai_provider                 = var.ai_provider
+  ai_model                    = var.ai_model
+  gemini_api_key              = var.gemini_api_key
+  groq_api_key                = var.groq_api_key
+  openrouter_api_key          = var.openrouter_api_key
+  langfuse_public_key         = var.langfuse_public_key
+  langfuse_secret_key         = var.langfuse_secret_key
+  otel_exporter_otlp_endpoint = var.otel_exporter_otlp_endpoint
+  otel_exporter_otlp_headers  = var.otel_exporter_otlp_headers
+}

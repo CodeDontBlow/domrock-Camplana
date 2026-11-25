@@ -73,6 +73,7 @@ services:
     volumes:
       # Código montado: alterações na Lana recarregam sem rebuild (uvicorn --reload).
       - ./DomRock-Lana:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
 
   frontend:

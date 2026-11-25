@@ -1,0 +1,164 @@
+name: Deploy Homolog (GHCR + Terraform + Render)
+
+on:
+  push:
+    branches:
+      - homolog
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Images (GHCR)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repositório e submódulos
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Calcular SHA curto
+        id: sha
+        run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push DomRock-Backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./DomRock-Backend
+          push: true
+          tags: |
+            ghcr.io/codedontblow/domrock-backend:homolog
+            ghcr.io/codedontblow/domrock-backend:${{ steps.sha.outputs.short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & Push DomRock-Lana
+        uses: docker/build-push-action@v6
+        with:
+          context: ./DomRock-Lana
+          push: true
+          tags: |
+            ghcr.io/codedontblow/domrock-lana:homolog
+            ghcr.io/codedontblow/domrock-lana:${{ steps.sha.outputs.short }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  terraform-and-deploy:
+    name: Terraform Apply & Render Deploy Hook
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: infra/terraform/environments/homolog
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Restaurar terraform.tfstate da branch tfstate-homolog
+        working-directory: .
+        run: |
+          if git ls-remote --exit-code --heads origin tfstate-homolog >/dev/null 2>&1; then
+            git fetch origin tfstate-homolog --depth=1
+            git show origin/tfstate-homolog:terraform.tfstate > infra/terraform/environments/homolog/terraform.tfstate
+            echo "Estado restaurado da branch tfstate-homolog."
+          else
+            echo "Branch tfstate-homolog ainda não existe; iniciando estado novo."
+          fi
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Terraform Init
+        run: terraform init
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
+          VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
+          VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          TF_VAR_lana_db_password: ${{ secrets.LANA_DB_PASSWORD }}
+          TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+          TF_VAR_gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          TF_VAR_groq_api_key: ${{ secrets.GROQ_API_KEY }}
+          TF_VAR_openrouter_api_key: ${{ secrets.OPENROUTER_API_KEY }}
+          TF_VAR_langfuse_public_key: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
+          TF_VAR_langfuse_secret_key: ${{ secrets.LANGFUSE_SECRET_KEY }}
+          TF_VAR_otel_exporter_otlp_endpoint: ${{ secrets.GRAFANA_OTLP_ENDPOINT }}
+          TF_VAR_otel_exporter_otlp_headers: ${{ secrets.GRAFANA_OTLP_HEADERS }}
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -input=false -auto-approve tfplan
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
+          VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+
+      - name: Persistir terraform.tfstate na branch tfstate-homolog
+        if: always()
+        working-directory: .
+        run: |
+          STATE_FILE="infra/terraform/environments/homolog/terraform.tfstate"
+          if [ ! -f "$STATE_FILE" ]; then
+            echo "Nenhum terraform.tfstate gerado para persistir."
+            exit 0
+          fi
+
+          TMP_DIR=$(mktemp -d)
+          if git ls-remote --exit-code --heads origin tfstate-homolog >/dev/null 2>&1; then
+            git clone --branch tfstate-homolog --single-branch --depth=1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" "$TMP_DIR"
+          else
+            git init "$TMP_DIR"
+            git -C "$TMP_DIR" checkout --orphan tfstate-homolog
+            git -C "$TMP_DIR" remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          fi
+
+          cp "$STATE_FILE" "$TMP_DIR/terraform.tfstate"
+          git -C "$TMP_DIR" config user.name "github-actions[bot]"
+          git -C "$TMP_DIR" config user.email "github-actions[bot]@users.noreply.github.com"
+          git -C "$TMP_DIR" add terraform.tfstate
+          if ! git -C "$TMP_DIR" diff --cached --quiet; then
+            git -C "$TMP_DIR" commit -m "chore(tfstate): update homolog state (${{ github.sha }})"
+            git -C "$TMP_DIR" push origin tfstate-homolog
+          else
+            echo "Nenhuma alteração no terraform.tfstate."
+          fi
+
+      - name: Disparar Deploy Hooks no Render (Lana e Backend)
+        if: steps.apply.outcome == 'success'
+        run: |
+          if [ -n "$RENDER_LANA_DEPLOY_HOOK" ]; then
+            curl -fsSL -X POST "$RENDER_LANA_DEPLOY_HOOK"
+          fi
+          if [ -n "$RENDER_BACKEND_DEPLOY_HOOK" ]; then
+            curl -fsSL -X POST "$RENDER_BACKEND_DEPLOY_HOOK"
+          fi
+        env:
+          RENDER_LANA_DEPLOY_HOOK: ${{ secrets.RENDER_LANA_DEPLOY_HOOK }}
+          RENDER_BACKEND_DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}

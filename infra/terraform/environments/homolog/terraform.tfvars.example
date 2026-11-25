@@ -1,0 +1,16 @@
+# Copie para terraform.tfvars localmente (nunca commitar com segredos reais).
+# No CI/CD, esses valores são injetados via variáveis TF_VAR_* a partir dos GitHub Secrets.
+
+lana_db_password = "troque-por-senha-forte-lana"
+jwt_secret       = "troque-por-segredo-jwt-com-no-minimo-32-caracteres"
+
+ai_provider        = "GEMINI"
+ai_model           = "gemini-2.5-flash-lite"
+gemini_api_key     = ""
+groq_api_key       = ""
+openrouter_api_key = ""
+
+langfuse_public_key         = ""
+langfuse_secret_key         = ""
+otel_exporter_otlp_endpoint = ""
+otel_exporter_otlp_headers  = ""

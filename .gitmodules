@@ -1,12 +1,12 @@
 [submodule "DomRock-Frontend"]
 	path = DomRock-Frontend
 	url = https://github.com/codedontblow/domrock-frontend.git
-	branch = develop
+	branch = homolog
 [submodule "DomRock-Backend"]
 	path = DomRock-Backend
 	url = https://github.com/codedontblow/domrock-backend.git
-	branch = develop
+	branch = homolog
 [submodule "DomRock-Lana"]
 	path = DomRock-Lana
 	url = https://github.com/codedontblow/domrock-lana.git
-	branch = develop
+	branch = homolog
