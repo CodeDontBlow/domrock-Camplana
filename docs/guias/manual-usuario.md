@@ -6,6 +6,8 @@ O **Camplana** ajuda a Dom Rock a planejar campanhas de comissionamento antes de
 
 Este manual vale para a versão do fim da Sprint 3 e está organizado por perfil. Para instalar o sistema, veja o [Manual de Instalação](manual-instalacao.md).
 
+Prefere ver funcionando? O [vídeo tutorial](https://youtu.be/GkWMWjIWTaI) mostra o fluxo completo da Sprint 3, da Gerente ao Auditor, em cerca de 5 minutos.
+
 ---
 
 ## Sumário
