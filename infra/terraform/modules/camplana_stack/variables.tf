@@ -31,6 +31,11 @@ variable "github_org" {
   default     = "codedontblow"
 }
 
+variable "neon_org_id" {
+  description = "ID da organização no Neon.tech (ex: org-...)"
+  type        = string
+}
+
 variable "neon_region_id" {
   description = "Região do projeto PostgreSQL 16 no Neon"
   type        = string

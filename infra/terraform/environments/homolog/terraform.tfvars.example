@@ -1,6 +1,7 @@
 # Copie para terraform.tfvars localmente (nunca commitar com segredos reais).
 # No CI/CD, esses valores são injetados via variáveis TF_VAR_* a partir dos GitHub Secrets.
 
+neon_org_id      = "org-xxxxxxxxxxxx"
 lana_db_password = "troque-por-senha-forte-lana"
 jwt_secret       = "troque-por-segredo-jwt-com-no-minimo-32-caracteres"
 

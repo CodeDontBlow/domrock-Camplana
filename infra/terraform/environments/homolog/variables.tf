@@ -1,3 +1,8 @@
+variable "neon_org_id" {
+  description = "ID da organização no Neon.tech"
+  type        = string
+}
+
 variable "lana_db_password" {
   type      = string
   sensitive = true

@@ -5,6 +5,9 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
 ## [Unreleased]
 
 ### Fixed
+- **`infra/terraform/` (`neon_project.this`) e `.github/workflows/deploy-homolog.yml`**:
+  - Adicionada a variável `neon_org_id` no módulo `camplana_stack` e nos ambientes `homolog` e `prod`, mapeando `org_id = var.neon_org_id` em `neon_project.this` e injetando `TF_VAR_neon_org_id` via secret `NEON_ORG_ID` no GitHub Actions.
+  - **Por quê:** o provider `kislerdm/neon` (v0.18.0) exige `org_id` na criação do recurso `neon_project`.
 - **`infra/terraform/environments/{homolog,prod}/providers.tf` e `modules/camplana_stack/versions.tf`**:
   - Adicionado o bloco `terraform { required_providers { ... } }` (`render-oss/render`, `vercel/vercel`, `kislerdm/neon`) também nos módulos raiz `homolog` e `prod`, mantendo `modules/camplana_stack/versions.tf` apenas com `required_providers` (sem blocos `provider`).
   - **Por quê:** sem `required_providers` no módulo raiz, o `terraform init` tentava resolver `provider "render"`, `provider "vercel"` e `provider "neon"` no namespace padrão `hashicorp/*`.

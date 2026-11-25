@@ -14,6 +14,7 @@ Cadastre em **Settings → Secrets and variables → Actions** no repositório `
 | `RENDER_OWNER_ID` | Sim | Workspace/Owner ID no Render (ex.: `tea-...` ou `usr-...`) |
 | `VERCEL_API_TOKEN` | Sim | Token de API da Vercel (`vercel/vercel`) |
 | `NEON_API_KEY` | Sim | API Key da conta Neon.tech (`kislerdm/neon`) |
+| `NEON_ORG_ID` | Sim | Organization ID no Neon.tech (`org-...`, exigido pelo provider `kislerdm/neon`) |
 | `LANA_DB_PASSWORD` | Sim | Senha definida para a role somente leitura `lana_leitura` no PostgreSQL |
 | `JWT_SECRET` | Sim | Segredo de assinatura JWT do Backend (mínimo 32 caracteres) |
 | `GEMINI_API_KEY` | Condicional* | Chave da API Google Gemini para a Lana |

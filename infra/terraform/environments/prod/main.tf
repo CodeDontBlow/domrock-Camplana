@@ -6,6 +6,7 @@ module "camplana" {
   git_branch  = "main"
   render_plan = "free"
 
+  neon_org_id                 = var.neon_org_id
   lana_db_password            = var.lana_db_password
   jwt_secret                  = var.jwt_secret
   ai_provider                 = var.ai_provider

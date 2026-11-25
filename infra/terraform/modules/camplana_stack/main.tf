@@ -8,6 +8,7 @@ locals {
 # 1. PostgreSQL 16 gerenciado no Neon.tech
 resource "neon_project" "this" {
   name                      = "camplana-${var.environment}"
+  org_id                    = var.neon_org_id
   pg_version                = 16
   region_id                 = var.neon_region_id
   history_retention_seconds = 21600
