@@ -4,6 +4,11 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
 
 ## [Unreleased]
 
+### Fixed
+- **`infra/terraform/environments/{homolog,prod}/providers.tf` e `modules/camplana_stack/versions.tf`**:
+  - Adicionado o bloco `terraform { required_providers { ... } }` (`render-oss/render`, `vercel/vercel`, `kislerdm/neon`) também nos módulos raiz `homolog` e `prod`, mantendo `modules/camplana_stack/versions.tf` apenas com `required_providers` (sem blocos `provider`).
+  - **Por quê:** sem `required_providers` no módulo raiz, o `terraform init` tentava resolver `provider "render"`, `provider "vercel"` e `provider "neon"` no namespace padrão `hashicorp/*`.
+
 ### Changed
 - **`infra/terraform/` (`backend.tf`), `.github/workflows/deploy-homolog.yml` e `docs/infra/DEPLOY_GUIDE.md`**:
   - Removido o bloco `cloud` (HCP Terraform) e a dependência de `TF_API_TOKEN`, passando a usar o backend `local` do Terraform.
