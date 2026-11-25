@@ -75,8 +75,7 @@ resource "render_web_service" "lana" {
 }
 
 resource "render_env_group" "lana_env" {
-  name        = "domrock-lana-env-${var.environment}"
-  service_ids = [render_web_service.lana.id]
+  name = "domrock-lana-env-${var.environment}"
 
   env_vars = {
     PORT = { value = "8000" }
@@ -95,6 +94,11 @@ resource "render_env_group" "lana_env" {
     OTEL_EXPORTER_OTLP_HEADERS  = { value = var.otel_exporter_otlp_headers }
     OTEL_SERVICE_NAME           = { value = "domrock-lana-${var.environment}" }
   }
+}
+
+resource "render_env_group_link" "lana" {
+  env_group_id = render_env_group.lana_env.id
+  service_id   = render_web_service.lana.id
 }
 
 # 3. Backend Spring Boot (DomRock-Backend) no Render Free
@@ -118,8 +122,7 @@ resource "render_web_service" "backend" {
 }
 
 resource "render_env_group" "backend_env" {
-  name        = "domrock-backend-env-${var.environment}"
-  service_ids = [render_web_service.backend.id]
+  name = "domrock-backend-env-${var.environment}"
 
   env_vars = {
     JAVA_OPTS                   = { value = "-XX:MaxRAMPercentage=70.0 -XX:+UseSerialGC -Xss512k" }
@@ -137,6 +140,11 @@ resource "render_env_group" "backend_env" {
     OTEL_EXPORTER_OTLP_ENDPOINT = { value = var.otel_exporter_otlp_endpoint }
     OTEL_EXPORTER_OTLP_HEADERS  = { value = var.otel_exporter_otlp_headers }
   }
+}
+
+resource "render_env_group_link" "backend" {
+  env_group_id = render_env_group.backend_env.id
+  service_id   = render_web_service.backend.id
 }
 
 # 4. Frontend Vue 3 (DomRock-Frontend) na Vercel
