@@ -98,7 +98,7 @@ resource "render_env_group" "lana_env" {
 
 resource "render_env_group_link" "lana" {
   env_group_id = render_env_group.lana_env.id
-  service_id   = render_web_service.lana.id
+  service_ids  = [render_web_service.lana.id]
 }
 
 # 3. Backend Spring Boot (DomRock-Backend) no Render Free
@@ -144,7 +144,7 @@ resource "render_env_group" "backend_env" {
 
 resource "render_env_group_link" "backend" {
   env_group_id = render_env_group.backend_env.id
-  service_id   = render_web_service.backend.id
+  service_ids  = [render_web_service.backend.id]
 }
 
 # 4. Frontend Vue 3 (DomRock-Frontend) na Vercel
