@@ -69,6 +69,15 @@ resource "render_web_service" "lana" {
     }
   }
 
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
+resource "render_env_group" "lana_env" {
+  name        = "domrock-lana-env-${var.environment}"
+  service_ids = [render_web_service.lana.id]
+
   env_vars = {
     PORT = { value = "8000" }
     DATABASE_URL = {
@@ -85,10 +94,6 @@ resource "render_web_service" "lana" {
     OTEL_EXPORTER_OTLP_ENDPOINT = { value = var.otel_exporter_otlp_endpoint }
     OTEL_EXPORTER_OTLP_HEADERS  = { value = var.otel_exporter_otlp_headers }
     OTEL_SERVICE_NAME           = { value = "domrock-lana-${var.environment}" }
-  }
-
-  lifecycle {
-    ignore_changes = [maintenance_mode]
   }
 }
 
@@ -107,6 +112,15 @@ resource "render_web_service" "backend" {
     }
   }
 
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
+resource "render_env_group" "backend_env" {
+  name        = "domrock-backend-env-${var.environment}"
+  service_ids = [render_web_service.backend.id]
+
   env_vars = {
     JAVA_OPTS                   = { value = "-XX:MaxRAMPercentage=70.0 -XX:+UseSerialGC -Xss512k" }
     LANA_CHAT_TRANSPORT         = { value = "http" }
@@ -122,10 +136,6 @@ resource "render_web_service" "backend" {
     OTEL_METRICS_ENABLED        = { value = local.otel_enabled }
     OTEL_EXPORTER_OTLP_ENDPOINT = { value = var.otel_exporter_otlp_endpoint }
     OTEL_EXPORTER_OTLP_HEADERS  = { value = var.otel_exporter_otlp_headers }
-  }
-
-  lifecycle {
-    ignore_changes = [maintenance_mode]
   }
 }
 

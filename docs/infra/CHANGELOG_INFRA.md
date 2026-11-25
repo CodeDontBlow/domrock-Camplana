@@ -5,6 +5,10 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
 ## [Unreleased]
 
 ### Fixed
+- **`infra/terraform/modules/camplana_stack/main.tf` e `.github/workflows/deploy-homolog.yml` (Render Free Tier `env_vars` + `maintenance_mode`)**:
+  - Movidas as variáveis de ambiente inline de `render_web_service.lana` e `render_web_service.backend` para os recursos dedicados `render_env_group.lana_env` e `render_env_group.backend_env` (`service_ids`).
+  - Alterado o lifecycle de ambos os `render_web_service` para `ignore_changes = all`, evitando que o provider `render-oss/render` envie `PATCH` com `maintenance_mode` em serviços Free Tier ao atualizar variáveis de ambiente.
+  - Removido o bloco temporário `terraform state rm module.camplana.neon_*` de `deploy-homolog.yml`.
 - **`.github/workflows/deploy-homolog.yml` e `infra/terraform/modules/camplana_stack/main.tf` (Neon State Drift)**:
   - Adicionada limpeza idempotente (`terraform state rm ... || true`) antes do `terraform plan` para `neon_endpoint.env`, `neon_branch.env`, `neon_role.owner` e `neon_database.this` após recriação do projeto Neon.
   - Adicionado `lifecycle { replace_triggered_by = [neon_project.this.id] }` nos recursos filhos do Neon em `main.tf` para garantir recriação em cascata caso `neon_project.this` seja substituído no futuro.
