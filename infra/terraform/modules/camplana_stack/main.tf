@@ -17,18 +17,30 @@ resource "neon_project" "this" {
 resource "neon_branch" "env" {
   project_id = neon_project.this.id
   name       = var.environment
+
+  lifecycle {
+    replace_triggered_by = [neon_project.this.id]
+  }
 }
 
 resource "neon_endpoint" "env" {
   project_id = neon_project.this.id
   branch_id  = neon_branch.env.id
   type       = "read_write"
+
+  lifecycle {
+    replace_triggered_by = [neon_project.this.id]
+  }
 }
 
 resource "neon_role" "owner" {
   project_id = neon_project.this.id
   branch_id  = neon_branch.env.id
   name       = "camplana_app"
+
+  lifecycle {
+    replace_triggered_by = [neon_project.this.id]
+  }
 }
 
 resource "neon_database" "this" {
@@ -36,6 +48,10 @@ resource "neon_database" "this" {
   branch_id  = neon_branch.env.id
   name       = var.db_name
   owner_name = neon_role.owner.name
+
+  lifecycle {
+    replace_triggered_by = [neon_project.this.id]
+  }
 }
 
 # 2. Motor de IA (DomRock-Lana) no Render Free

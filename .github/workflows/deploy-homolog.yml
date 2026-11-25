@@ -120,6 +120,13 @@ jobs:
           TF_VAR_otel_exporter_otlp_endpoint: ${{ secrets.GRAFANA_OTLP_ENDPOINT }}
           TF_VAR_otel_exporter_otlp_headers: ${{ secrets.GRAFANA_OTLP_HEADERS }}
 
+      - name: Limpar state drift de recursos filhos do Neon (temporário)
+        run: |
+          terraform state rm module.camplana.neon_endpoint.env || true
+          terraform state rm module.camplana.neon_branch.env || true
+          terraform state rm module.camplana.neon_role.owner || true
+          terraform state rm module.camplana.neon_database.this || true
+
       - name: Terraform Plan
         run: terraform plan -input=false -out=tfplan
         env:
