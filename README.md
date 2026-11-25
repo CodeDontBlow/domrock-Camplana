@@ -301,6 +301,7 @@ Toda a documentação complementar do projeto permanece versionada no diretório
 - [Padrões de Commit](docs/padrao-commit.md)
 - [Manual do Usuário](docs/guias/manual-usuario.md)
 - [Manual de Instalação](docs/guias/manual-instalacao.md)
+- [Vídeo tutorial: incremento da Sprint 3](https://youtu.be/GkWMWjIWTaI)
 - [Roteiro de Review da Sprint 2](docs/guias/roteiro-review-sprint-2.md)
 
 ---
