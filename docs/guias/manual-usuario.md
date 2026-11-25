@@ -1,144 +1,290 @@
 # Manual do Usuário — Camplana
 
-O **Camplana** é a plataforma de planejamento, simulação e governança de campanhas de comissionamento da Dom Rock, desenvolvida para auxiliar equipes comerciais e de gestão na tomada de decisões estratégicas embasadas em dados históricos reais.
+O **Camplana** ajuda a Dom Rock a planejar campanhas de comissionamento antes de colocá-las em prática. A Gerente descreve a campanha em linguagem natural para a **Lana**, a agente de IA do sistema. A Lana preenche os parâmetros e simula quanto a campanha custaria sobre as vendas reais. Depois, a campanha passa pela aprovação de um Supervisor e pode ser consultada por um Auditor.
 
-A aplicação conta com a **Lana**, uma agente de IA que interpreta regras de negócio em linguagem natural, traduz os parâmetros para o painel de controle e executa simulações financeiras com total explicabilidade e rastreabilidade dos números apurados.
+**Nenhum número vem direto da IA.** A Lana gera o código Python da regra, que roda isolado sobre os dados e é conferido contra um cálculo determinístico.
 
----
-
-## 1. Perfis de Usuário e Acesso ao Sistema
-
-O sistema conta com três perfis de acesso bem definidos:
-
-- **Gerente de Vendas (`GERENTE`):** conversa com a Lana no chat, revisa e ajusta parâmetros de regras, executa simulações, salva e acompanha o status de suas campanhas, e as submete para avaliação.
-- **Supervisor de Vendas (`SUPERVISOR`):** além de todas as funções do Gerente, analisa campanhas submetidas na fila de aprovação (aprovação quatro-olhos), decide com justificativa (aprovar ou reprovar), re-simula versões congeladas, consulta o percentual vigente por marca/cargo e importa os lotes mensais de dados (RH, Vendas e Comissão).
-- **Administrador (`ADMIN`):** gerencia o cadastro dos usuários do sistema (criação, edição de dados, definição de perfil e ativação/desativação). Não atua no fluxo de campanhas nem simulações.
-
-### 1.1 Entrando no Sistema (Login)
-1. Acesse o endereço da aplicação no navegador (ex.: `http://localhost:5173`).
-2. Digite o e-mail e senha de acesso.
-   - Demonstração: `gabriela@camplana.com.br`, `sergio@camplana.com.br`, `silvia@camplana.com.br` ou `ana@camplana.com.br`, com a senha padrão `123456`.
-3. O sistema valida as credenciais contra a API via token JWT e redireciona automaticamente para a tela correspondente ao seu perfil de atuação:
-   - Gerentes e Supervisores entram na tela de **Chat / Planejamento**.
-   - Administradores são encaminhados para a **Gestão de Usuários**.
+Este manual vale para a versão do fim da Sprint 3 e está organizado por perfil. Para instalar o sistema, veja o [Manual de Instalação](manual-instalacao.md).
 
 ---
 
-## 2. Planejando e Simulando uma Campanha (Gerente de Vendas)
+## Sumário
 
-### 2.1 Conversa com a Lana em Linguagem Natural
-Na página principal de Chat:
-1. Digite a intenção da campanha na barra de mensagens inferior.
-   - *Exemplo:* `"Todas as vendas de 24/11 a 30/11 terão +1% de comissão (Black Friday) para todas as marcas e cargos, exceto gerentes (cargo 150), com meta de R$ 2.000.000."`
-2. A Lana interpreta o comando e preenche a ficha de parâmetros no painel lateral direito (**Campanha**).
-
-### 2.2 Revisão de Parâmetros
-No painel lateral, você pode revisar e ajustar diretamente os campos:
-- **Prazo da Campanha (Período):** datas de início e fim da ação comercial;
-- **Acréscimo de Comissão (%):** percentual adicional a ser concedido sobre as vendas;
-- **Marcas Participantes:** seleção de marcas específicas ou "Todas as Marcas";
-- **Cargos Elegíveis:** seleção dos cargos que recebem o incentivo (ex.: Vendedor Loja, Assistente, Balcão);
-- **Meta Financeira da Campanha (R$):** volume de vendas esperado;
-- **Orçamento Máximo de Incentivo (R$):** teto financeiro opcional para a campanha.
-
-### 2.3 Execução da Simulação
-1. Com a ficha conferida, clique no botão **Simular campanha**.
-2. A simulação é processada em segundo plano (job assíncrono): o painel apresenta o indicador de progresso ("Na fila" → "Simulando" → "Concluída").
-3. Ao concluir, o resultado financeiro da campanha é exibido:
-   - **Custo Adicional (Diferença):** valor extra estimado que a regra demanda além da folha base;
-   - **Impacto de Meta:** vendas apuradas no período, percentual de atingimento e se a meta foi superada;
-   - **Impacto em Pessoas:** quantidade de colaboradores elegíveis impactados e valores médios;
-   - **Detalhamento:** gráficos e tabelas com a distribuição do custo por Marca, por Cargo e pelas Maiores Lojas.
+1. [Perfis e acesso](#1-perfis-e-acesso)
+2. [Gerente de Vendas](#2-gerente-de-vendas)
+3. [Supervisor de Vendas](#3-supervisor-de-vendas)
+4. [Auditor](#4-auditor)
+5. [Administrador](#5-administrador)
+6. [Ciclo de vida de uma campanha](#6-ciclo-de-vida-de-uma-campanha)
+7. [Em desenvolvimento](#7-em-desenvolvimento)
 
 ---
 
-## 3. Explicabilidade: "De onde vieram esses números?"
+## 1. Perfis e acesso
 
-Ao analisar qualquer simulação concluída, o usuário pode clicar em **"De onde vieram esses números"** para consultar a trilha de auditoria completa gerada pela Lana:
-- **Passos executados:** sequência exata de processamento (carregamento de bases, cálculo do baseline sem campanha, geração e conferência do código da regra);
-- **Consultas e Tabelas:** quais tabelas do banco de dados foram consultadas (`venda`, `funcionario_loja`, `marca_cargo`), filtros aplicados e competências lidas;
-- **Conferência de Integridade:** validações aplicadas pelo algoritmo de referência (ausência de comissões negativas, conferência determinística);
-- **Código Python da Regra:** supervisores têm visibilidade sobre o código gerado para conferência técnica.
+| Perfil | O que pode fazer | Tela inicial |
+|---|---|---|
+| **Gerente de Vendas** | Criar campanhas conversando com a Lana, simular, publicar para aprovação e acompanhar as próprias campanhas | Nova Campanha (chat) |
+| **Supervisor de Vendas** | Tudo da Gerente, mais aprovar ou devolver campanhas de outras pessoas e importar a base mensal | Nova Campanha (chat) |
+| **Auditor** | Consultar, sem alterar, as campanhas, versões, conversas e decisões de todos; ver o SQL e o código gerados; abrir e resolver alertas técnicos | Auditoria |
+| **Administrador** | Só a gestão de usuários. Não vê campanhas nem simulações | Usuários |
 
----
+### 1.1 Entrar no sistema
 
-## 4. Gestão e Ciclo de Vida da Campanha
+1. Abra o endereço do sistema no navegador (na instalação local, `http://localhost:5173`).
+2. Informe o e-mail e a senha e clique em **Entrar**.
+3. O sistema abre a tela inicial do seu perfil.
 
-### 4.1 Salvando a Campanha
-Após rodar uma simulação satisfatória:
-1. No painel de resultados, clique em **Salvar Campanha**.
-2. Informe o nome da campanha (ex.: `"Black Friday 2025"`).
-3. A campanha é criada no status **`RASCUNHO`**.
+![Tela de login](imagens/manual-usuario/login.png)
 
-### 4.2 Acompanhando "Minhas Campanhas"
-Acesse o menu lateral **Minhas Campanhas** (`/campanhas`):
-- Visualize a lista de todas as suas campanhas criadas, ordenadas pela atualização mais recente.
-- Cada cartão apresenta o status atual, período de vigência, custo adicional calculado e ações disponíveis:
-  - **`RASCUNHO`:** permite **Renomear**, **Submeter para análise** ou **Arquivar**.
-  - **`AGUARDANDO_APROVACAO`:** versão congelada em análise pela supervisão.
-  - **`APROVADA`:** campanha aprovada e registrada na esteira comercial.
-  - **`REPROVADA`:** reprovada com justificativa visível. Permite a ação **Editar** (que retorna a campanha para Rascunho para ajustes e nova submissão v2) ou **Arquivar**.
+Na demonstração, todos usam a senha `123456`: `gabriela` (Gerente), `sergio` e `silvia` (Supervisores), `paulo` (Auditor) e `ana` (Administradora), sempre com `@camplana.com.br`.
 
-### 4.3 Submissão para Aprovação
-1. Na campanha em `RASCUNHO`, clique em **Submeter**.
-2. O sistema congela a versão atual (v1) contendo a ficha exata de parâmetros, o resultado financeiro apurado e a trilha de números.
-3. A campanha transita para **`AGUARDANDO_APROVACAO`** e entra imediatamente na fila dos supervisores de vendas.
+Para sair, clique no ícone de desligar, ao lado do seu nome, no canto inferior esquerdo.
 
 ---
 
-## 5. Fila e Fluxo de Aprovação (Supervisor de Vendas)
+## 2. Gerente de Vendas
 
-O Camplana adota o princípio de **aprovação quatro-olhos**: uma campanha só pode ser decidida por um supervisor diferente do autor que a submeteu.
+### 2.1 Descrever a campanha para a Lana
 
-### 5.1 Fila de Aprovação
-Como Supervisor (Sérgio ou Sílvia), acesse o menu **Campanhas / Aprovações** (`/campanha`):
-1. A aba **Fila de Aprovação** lista as versões pendentes enviadas por outros usuários.
-2. Cada item indica o autor, data de submissão, custo adicional estimado e se há **conflitos de sobreposição** de período com outras campanhas.
+1. No menu lateral, clique em **Nova Campanha**.
+2. Escreva a campanha no campo de mensagem e tecle **Enter**. Exemplo:
+   > Quero uma campanha de Black Friday de 23/11/2026 a 29/11/2026: +1% de comissão para todas as marcas e cargos, exceto gerentes (cargo 150), com meta de R$ 2.000.000 e orçamento de R$ 30.000.
+3. A Lana responde no chat e preenche o painel **Simulação**, à direita. Se faltar alguma informação, ela pergunta, sem inventar valores.
 
-### 5.2 Tomada de Decisão
-Ao abrir uma versão para análise:
-1. Revise os parâmetros congelados, as metas, as quebras de custo e o histórico de comissão.
-2. Em caso de sobreposição de períodos, o sistema aponta as datas de conflito e as marcas/cargos coincidentes.
-3. Decida a ação:
-   - **Aprovar:** registra o status `APROVADA` e o log de decisão no sistema (justificativa opcional).
-   - **Reprovar:** exige o preenchimento de uma **justificativa obrigatória** explicando o motivo do indeferimento comercial (ex.: *"Meta de vendas desproporcional ao histórico da quinzena"*). A campanha passa para `REPROVADA` e a justificativa fica registrada no histórico do autor.
-   - **Re-simular:** recalcula os impactos da regra congelada considerando as campanhas mais recentes aprovadas no mesmo período.
+Cada conversa trata de uma única campanha. Suas conversas ficam em **Seus Chats**, no menu lateral.
+
+![Chat com a Lana sugerindo o mês de referência](imagens/manual-usuario/gerente-01-chat.png)
+
+### 2.2 Campanha num mês futuro (novidade da Sprint 3)
+
+A base tem vendas de julho a dezembro de 2025. Para uma campanha num período sem dados, como a Black Friday de 2026, a Lana:
+
+1. sugere um **mês de referência** de 2025 (no exemplo, novembro de 2025);
+2. pergunta o **% de crescimento** das vendas sobre esse mês. Sem resposta, vale 0%.
+
+O cálculo usa as vendas reais do mês de referência ajustadas pelo crescimento. Isso não é uma previsão de vendas.
+
+### 2.3 Revisar os parâmetros
+
+No painel **Simulação**, confira e ajuste o que precisar antes de simular:
+
+| Campo | O que é |
+|---|---|
+| **Período** | Datas de início e fim da campanha |
+| **Acréscimo** | Pontos percentuais somados à comissão (botões `−` e `+` de 0,1 em 0,1) |
+| **Marcas** | Marcas participantes, ou **Todas** |
+| **Cargos** | Cargos que recebem o acréscimo |
+| **Mês de referência** e **% de crescimento** | Só em campanhas de período futuro (seção 2.2) |
+| **Meta de vendas** | Volume de vendas esperado, em R$ |
+| **Extras** | Orçamento máximo da campanha, opcional (**Adicionar orçamento** / **Tirar o orçamento**) |
+
+![Painel Simulação com mês de referência e crescimento](imagens/manual-usuario/gerente-02-painel.png)
+
+### 2.4 Simular
+
+1. Clique em **Simular Campanha**.
+2. A Lana gera o código da regra, executa num ambiente isolado e confere o resultado. Leva de alguns segundos a cerca de um minuto.
+3. O resultado aparece no chat:
+   - **Meta:** quanto as vendas do período representam da meta;
+   - **Custo extra** da campanha sobre a comissão atual e se ele **cabe no orçamento**;
+   - **Pessoas** que recebem o acréscimo e o valor médio;
+   - **Onde o custo pesa:** por marca, por cargo e pelas lojas de maior custo;
+   - **Outros cenários, já simulados:** por exemplo, o maior acréscimo que ainda cabe no orçamento. **Usar no painel** copia o cenário para os parâmetros.
+
+![Resultado da simulação](imagens/manual-usuario/gerente-03-resultado.png)
+
+### 2.5 Quanto cada pessoa recebe (novidade da Sprint 3)
+
+Abaixo do resultado, o **detalhamento por pessoa** lista cada funcionário com matrícula, cargo, loja, base de cálculo, % aplicado e os **ajustes** das regras da especificação que valeram para ele. Use **Anterior** e **Próxima** para navegar.
+
+![Detalhamento da apuração por pessoa](imagens/manual-usuario/gerente-04-por-pessoa.png)
+
+### 2.6 Como foi calculado
+
+Clique em **Como foi calculado** para ver de onde vieram os números:
+
+- se o resultado da IA bateu com o cálculo determinístico;
+- as premissas da simulação (por exemplo, que as pessoas venderiam o mesmo que no período de referência);
+- as regras da especificação aplicadas (5a a 5g);
+- as **intercorrências de RH** (afastamentos, férias, desligamentos). Só as já aprovadas entram na apuração; as pendentes ficam de fora e a tela avisa (novidade da Sprint 3).
+
+![Como foi calculado](imagens/manual-usuario/gerente-05-como-foi-calculado.png)
+
+O SQL e o código Python gerados pela Lana aparecem só para o Supervisor e o Auditor (novidade da Sprint 3).
+
+### 2.7 Publicar para aprovação
+
+1. Com uma simulação concluída, clique em **Compartilhar Campanha**, no topo do chat.
+2. Dê um nome à campanha e clique em **Publicar**.
+3. A campanha congela a versão atual (parâmetros, resultado e conversa) e entra na fila dos Supervisores como **Aguardando aprovação**.
+
+![Publicar a campanha](imagens/manual-usuario/gerente-06-publicar.png)
+
+### 2.8 Acompanhar as campanhas
+
+No menu **Campanhas**, a tela **Minhas Campanhas** lista as suas campanhas com período, status, versão, custo adicional e data da última alteração. Filtre por **Rascunho**, **Aguardando**, **Aprovada**, **Reprovada** ou **Arquivada**. Clique numa campanha para abrir a conversa dela.
+
+![Minhas Campanhas](imagens/manual-usuario/gerente-07-minhas-campanhas.png)
+
+### 2.9 Eventos no chat (novidade da Sprint 3)
+
+O chat da campanha mostra o que aconteceu com ela, na ordem: **Enviado para análise** e depois **Aprovado por** ou **Reprovado por** (com o comentário do Supervisor), sempre com a data. Depois de aprovada, a conversa fica **aberta só para consulta**.
+
+Se o Supervisor devolver a campanha, o comentário dele aparece no chat. Continue a conversa, ajuste os parâmetros, simule de novo e publique: a campanha volta para a fila como versão 2.
+
+![Eventos da campanha no chat](imagens/manual-usuario/gerente-08-eventos-no-chat.png)
 
 ---
 
-## 6. Percentual Vigente por Marca e Cargo
+## 3. Supervisor de Vendas
 
-No menu **% Vigente** (`/vigente`):
-- Consulte a matriz consolidada de comissões para cada combinação de Marca e Cargo da rede.
-- Visualize o percentual base importado e o percentual efetivo vigente resultante das campanhas ativas e acordos comerciais no período.
+O Supervisor faz tudo o que a Gerente faz (seção 2) e também decide sobre as campanhas e importa a base mensal.
+
+### 3.1 Fila de aprovação
+
+No menu **Campanhas**:
+
+- **Aguardando Aprovação** mostra um cartão por campanha pendente, com período, acréscimo, custo extra, conflitos com outras campanhas, autor e data de envio;
+- **Campanhas aprovadas** separa as aprovadas em três abas (novidade da Sprint 3):
+  - **Realizadas:** o período já terminou;
+  - **Em andamento:** o período inclui o dia de hoje;
+  - **Previstas:** o período ainda não começou.
+
+![Tela Campanhas do Supervisor](imagens/manual-usuario/supervisor-01-campanhas.png)
+
+### 3.2 Analisar e decidir
+
+Clique num cartão para abrir o painel **Visualizando Campanha**: resumo da Lana, link para o chat, parâmetros, custo e as campanhas que conflitam no mesmo período. As ações são:
+
+- **Aprovar:** a campanha passa para **Aprovada**;
+- **Devolver campanha:** escreva o comentário (obrigatório) explicando o que ajustar. A Gerente vê o comentário no chat;
+- **Simular de novo:** recalcula a versão considerando as campanhas aprovadas depois do envio. Se outra campanha do mesmo período foi aprovada depois que esta foi enviada, o sistema exige simular de novo antes de aprovar.
+
+A aprovação é feita por **outra pessoa**: o Supervisor não decide uma campanha que ele mesmo criou.
+
+### 3.3 Alerta técnico trava a aprovação (novidade da Sprint 3)
+
+Se a versão tiver um **alerta técnico aberto**, o painel avisa e o botão **Aprovar** não aparece. Só o Auditor resolve o alerta (seção 4.4). Devolver a campanha continua possível.
+
+![Painel com alerta técnico aberto](imagens/manual-usuario/supervisor-02-painel-alerta.png)
+
+Depois de aprovada, a campanha aparece na aba correspondente ao período:
+
+![Campanha aprovada em andamento](imagens/manual-usuario/supervisor-03-em-andamento.png)
+
+### 3.4 Importar a base do mês
+
+No menu **Importar base**:
+
+1. Arraste as planilhas `.xlsx` do mês ou clique para escolher. O nome do arquivo diz o tipo e o mês: `BASE RH_OUT25.xlsx`, `BASE_VENDAS_OUT25.xlsx` e `BASE_COMMISS_OUT25.xlsx`. RH e Vendas são obrigatórias; a Comissão é opcional. Vários meses podem ir de uma vez.
+2. Clique em **Importar**.
+3. O **Histórico de envios** mostra cada envio com competência, data, quem enviou, situação e linhas gravadas. Clique em **Ver relatório** para as pendências:
+   - **aviso:** não impede a carga (por exemplo, funcionário sem vendas no mês);
+   - **impeditiva:** nada é gravado. Corrija a planilha e envie de novo.
+
+![Importar base do mês](imagens/manual-usuario/supervisor-04-importar.png)
 
 ---
 
-## 7. Importação da Base Mensal (Supervisor de Vendas)
+## 4. Auditor
 
-No menu **Importar Bases** (`/importar`), o Supervisor realiza a ingestão dos dados operacionais da Dom Rock:
+Perfil novo da Sprint 3. O Auditor consulta tudo, **somente para leitura**: não cria, não simula, não aprova. A única ação dele é abrir e resolver alertas técnicos.
 
-### 7.1 Envio de Arquivos
-1. Selecione os arquivos `.xlsx` do mês:
-   - Planilha de RH (`BASE RH_MMM25.xlsx`);
-   - Planilha de Vendas (`BASE_VENDAS_MMM25.xlsx`);
-   - Planilha de Comissão (`BASE_COMMISS_FINAL.xlsx`, quando aplicável ou enviada individualmente).
-2. Clique em **Importar Base**.
-3. O envio cria um job assíncrono e exibe a barra de progresso do processamento.
+### 4.1 Lista da Auditoria
 
-### 7.2 Acompanhamento e Relatório de Pendências
-Ao finalizar a importação, o sistema exibe o resumo:
-- Total de linhas lidas e efetivamente gravadas;
-- Contagem por categoria (RH, Vendas, Comissão);
-- **Relatório de Pendências:**
-  - **AVISO:** alertas não impeditivos (ex.: funcionário de RH que não realizou vendas no mês, ou venda de colaborador admitido no meio do mês). Os dados válidos são gravados com sucesso.
-  - **IMPEDITIVO:** inconsistências que impedem a carga (ex.: formato de arquivo inválido, ausência de colunas obrigatórias ou discrepância de competências). Quando há impeditivos, o job encerra como `PENDENTE` e nada é gravado no banco, assegurando a atomicidade.
+O menu **Auditoria** tem duas abas:
+
+- **Campanhas:** todas as campanhas de todos os usuários, com autor, status, período e última alteração. Busque pelo nome ou filtre pelo status;
+- **Correções da base:** os pedidos de correção da base cadastral e suas decisões.
+
+![Lista de campanhas na Auditoria](imagens/manual-usuario/auditor-01-lista.png)
+
+![Correções da base](imagens/manual-usuario/auditor-02-correcoes.png)
+
+### 4.2 Visão de negócio
+
+Clique numa campanha. O detalhe tem quatro abas:
+
+- **Versões:** parâmetros e resultado de cada versão. Em **Comparar com**, escolha outra versão para ver o que mudou;
+- **Decisões:** quem aprovou ou devolveu, quando e com qual justificativa;
+- **Conversa:** a conversa inteira entre o autor e a Lana;
+- **Técnica:** veja a seção 4.3.
+
+![Versões da campanha](imagens/manual-usuario/auditor-03-versoes.png)
+
+![Decisões](imagens/manual-usuario/auditor-04-decisoes.png)
+
+![Conversa com a Lana](imagens/manual-usuario/auditor-05-conversa.png)
+
+### 4.3 Visão técnica
+
+A aba **Técnica** mostra, para a versão escolhida:
+
+- **Trilha com SQLs executados:** cada passo da Lana, com a ferramenta usada, as tabelas acessadas, as competências, quantos registros voltaram e o SQL executado;
+- **Código Python gerado:** o código da regra que rodou na simulação;
+- **Alertas técnicos** da versão.
+
+![Aba Técnica](imagens/manual-usuario/auditor-06-tecnica.png)
+
+### 4.4 Abrir e resolver alertas técnicos
+
+Um alerta técnico trava a aprovação da versão até ser resolvido. Ele pode surgir de duas formas:
+
+- **automático:** a Lana registra quando bloqueia uma consulta SQL não permitida ou um código Python suspeito;
+- **manual:** o Auditor abre quando quer que algo seja conferido antes da aprovação.
+
+Para abrir: na aba **Técnica**, clique em **Abrir alerta**, descreva o problema e confirme.
+
+![Abrir alerta técnico](imagens/manual-usuario/auditor-07-abrir-alerta.png)
+
+Para resolver: clique em **Resolver alerta** no alerta aberto, escreva a justificativa (obrigatória) e confirme. A partir daí, o Supervisor pode aprovar.
+
+![Resolver alerta técnico](imagens/manual-usuario/auditor-08-resolver-alerta.png)
+
+O alerta resolvido continua no histórico, com quem abriu, quem resolveu, quando e a justificativa:
+
+![Alerta resolvido no histórico](imagens/manual-usuario/auditor-09-alerta-resolvido.png)
 
 ---
 
-## 8. Gestão de Usuários (Administrador)
+## 5. Administrador
 
-No menu **Gestão de Usuários** (`/admin`), exclusivo do perfil `ADMIN` (Ana):
-- **Listagem de Usuários:** consulta aos colaboradores cadastrados com nome, e-mail, perfil e status (Ativo/Inativo);
-- **Cadastro de Novo Usuário:** inclusão com nome, e-mail, perfil (`GERENTE`, `SUPERVISOR`, `ADMIN`) e senha inicial;
-- **Edição e Situação:** alteração do perfil de atuação e alternância do status (ativação ou inativação do usuário).
+O menu **Usuários** lista quem tem acesso, com nome, e-mail, perfil e situação (ativo ou inativo).
+
+![Gestão de usuários](imagens/manual-usuario/admin-01-usuarios.png)
+
+- **Adicionar usuário:** informe nome, e-mail, perfil (Gerente, Supervisor ou Administrador) e uma senha inicial de pelo menos 8 caracteres. A pessoa já entra com essa senha;
+- **Editar:** muda os dados e o perfil;
+- **Desativar:** a pessoa perde o acesso, mas o histórico dela continua no sistema.
+
+![Novo usuário](imagens/manual-usuario/admin-02-adicionar.png)
+
+---
+
+## 6. Ciclo de vida de uma campanha
+
+```text
+Gerente descreve  ─►  simula  ─►  publica  ─►  AGUARDANDO APROVAÇÃO
+                                                │
+                     alerta técnico aberto? ────┤ (Auditor resolve)
+                                                │
+                          Supervisor decide  ───┼──►  APROVADA  ─►  Realizadas / Em andamento / Previstas
+                                                │
+                                                └──►  DEVOLVIDA  ─►  Gerente ajusta e publica a versão 2
+```
+
+Cada publicação congela uma **versão** com os parâmetros, o resultado e a conversa daquele momento. O Auditor consulta todas as versões e decisões.
+
+---
+
+## 7. Em desenvolvimento
+
+Estes itens da Sprint 3 ainda não estão na versão descrita neste manual:
+
+- pedir a correção da base cadastral pela conversa com a Lana (A6-81);
+- a fila de **Solicitações**, onde ficam os pedidos de correção da base e de intercorrência para aprovação (A6-112). Hoje o menu **Solicitações** abre uma página vazia;
+- registrar intercorrências de RH pela conversa com a Lana (A6-124);
+- escolher o perfil **Auditor** ao cadastrar um usuário. Por enquanto, o único Auditor é o Paulo, criado pela migration V12.
+
+Enquanto isso, as intercorrências de RH da demonstração entram pela carga do `seed-demo.sh` (veja o Manual de Instalação).
