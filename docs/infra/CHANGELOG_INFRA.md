@@ -5,6 +5,9 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
 ## [Unreleased]
 
 ### Fixed
+- **`infra/terraform/` (`vercel_project.frontend`) e `.github/workflows/deploy-homolog.yml`**:
+  - Adicionada a variável `github_owner` com padrão `"CodeDontBlow"` para o recurso `vercel_project.frontend` (alinhando o case retornado pela API da Vercel), mantendo `github_org = "codedontblow"` em minúsculo para as imagens OCI/Docker no `ghcr.io`.
+  - Adicionado passo idempotente de `terraform import` no workflow `deploy-homolog.yml` caso `domrock-frontend-homolog` já exista na Vercel fora do state.
 - **`infra/terraform/` (`neon_project.this`) e `.github/workflows/deploy-homolog.yml`**:
   - Adicionada a variável `neon_org_id` no módulo `camplana_stack` e nos ambientes `homolog` e `prod`, mapeando `org_id = var.neon_org_id` em `neon_project.this` e injetando `TF_VAR_neon_org_id` via secret `NEON_ORG_ID` no GitHub Actions.
   - **Por quê:** o provider `kislerdm/neon` (v0.18.0) exige `org_id` na criação do recurso `neon_project`.

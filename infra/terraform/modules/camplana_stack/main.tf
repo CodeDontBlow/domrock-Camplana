@@ -112,7 +112,7 @@ resource "vercel_project" "frontend" {
 
   git_repository = {
     type              = "github"
-    repo              = "${var.github_org}/domrock-frontend"
+    repo              = "${var.github_owner}/domrock-frontend"
     production_branch = var.git_branch
   }
 }

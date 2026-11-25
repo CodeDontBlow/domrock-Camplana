@@ -1,3 +1,9 @@
+variable "github_owner" {
+  description = "Owner/Organização GitHub com case exato para a Vercel"
+  type        = string
+  default     = "CodeDontBlow"
+}
+
 variable "neon_org_id" {
   description = "ID da organização no Neon.tech"
   type        = string

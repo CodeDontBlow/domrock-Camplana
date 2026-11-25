@@ -26,9 +26,15 @@ variable "render_plan" {
 }
 
 variable "github_org" {
-  description = "Organização GitHub dona dos repositórios e imagens GHCR"
+  description = "Organização GitHub em minúsculo para o registry OCI/Docker (ghcr.io)"
   type        = string
   default     = "codedontblow"
+}
+
+variable "github_owner" {
+  description = "Owner/Organização GitHub com case exato para a API da Vercel"
+  type        = string
+  default     = "CodeDontBlow"
 }
 
 variable "neon_org_id" {
