@@ -67,15 +67,15 @@ variable "jwt_secret" {
 }
 
 variable "ai_provider" {
-  description = "Provedor principal de LLM da Lana (GEMINI, OPENROUTER ou GROQ)"
+  description = "Provedor principal de LLM da Lana (GROQ, GEMINI ou OPENROUTER)"
   type        = string
-  default     = "GEMINI"
+  default     = "GROQ"
 }
 
 variable "ai_model" {
   description = "Modelo principal de LLM da Lana"
   type        = string
-  default     = "gemini-2.5-flash-lite"
+  default     = "llama-3.3-70b-versatile"
 }
 
 variable "gemini_api_key" {

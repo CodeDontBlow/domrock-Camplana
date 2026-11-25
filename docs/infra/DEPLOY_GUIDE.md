@@ -17,8 +17,8 @@ Cadastre em **Settings → Secrets and variables → Actions** no repositório `
 | `NEON_ORG_ID` | Sim | Organization ID no Neon.tech (`org-...`, exigido pelo provider `kislerdm/neon`) |
 | `LANA_DB_PASSWORD` | Sim | Senha definida para a role somente leitura `lana_leitura` no PostgreSQL |
 | `JWT_SECRET` | Sim | Segredo de assinatura JWT do Backend (mínimo 32 caracteres) |
-| `GEMINI_API_KEY` | Condicional* | Chave da API Google Gemini para a Lana |
-| `GROQ_API_KEY` | Não | Chave da API Groq (fallback) |
+| `GROQ_API_KEY` | Condicional* | Chave da API Groq para a Lana (provedor padrão `GROQ` / `llama-3.3-70b-versatile`) |
+| `GEMINI_API_KEY` | Não | Chave da API Google Gemini (fallback) |
 | `OPENROUTER_API_KEY` | Não | Chave da API OpenRouter (fallback) |
 | `LANGFUSE_PUBLIC_KEY` | Não | Chave pública do Langfuse Cloud (tracing LLM/LangGraph) |
 | `LANGFUSE_SECRET_KEY` | Não | Chave secreta do Langfuse Cloud |

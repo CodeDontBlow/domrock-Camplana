@@ -70,6 +70,10 @@ resource "render_web_service" "lana" {
     OTEL_EXPORTER_OTLP_HEADERS  = { value = var.otel_exporter_otlp_headers }
     OTEL_SERVICE_NAME           = { value = "domrock-lana-${var.environment}" }
   }
+
+  lifecycle {
+    ignore_changes = [maintenance_mode]
+  }
 }
 
 # 3. Backend Spring Boot (DomRock-Backend) no Render Free
@@ -102,6 +106,10 @@ resource "render_web_service" "backend" {
     OTEL_METRICS_ENABLED        = { value = local.otel_enabled }
     OTEL_EXPORTER_OTLP_ENDPOINT = { value = var.otel_exporter_otlp_endpoint }
     OTEL_EXPORTER_OTLP_HEADERS  = { value = var.otel_exporter_otlp_headers }
+  }
+
+  lifecycle {
+    ignore_changes = [maintenance_mode]
   }
 }
 

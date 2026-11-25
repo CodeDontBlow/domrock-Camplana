@@ -5,6 +5,9 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
 ## [Unreleased]
 
 ### Fixed
+- **`infra/terraform/modules/camplana_stack/main.tf` (`render_web_service.lana` e `render_web_service.backend`)**:
+  - Adicionado `lifecycle { ignore_changes = [maintenance_mode] }` nos dois recursos `render_web_service`.
+  - **Por quê:** evitar que o provider `render-oss/render` tente atualizar `maintenance_mode` via `PATCH` em serviços do plano `free` (operação restrita a planos pagos).
 - **`DomRock-Frontend/vercel.json`, `infra/terraform/modules/camplana_stack/main.tf` e `DomRock-Backend` (CORS)**:
   - Criado `DomRock-Frontend/vercel.json` com rewrite SPA (`/(.*) -> /index.html`) para evitar `404 NOT_FOUND` em rotas diretas como `/login` na Vercel.
   - Adicionado `https://camplana.vercel.app` (junto de `https://domrock-frontend-homolog.vercel.app`) à lista padrão de `CORS_ALLOWED_ORIGINS` no módulo Terraform e no fallback do `DomRock-Backend`.
@@ -20,6 +23,9 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
   - **Por quê:** sem `required_providers` no módulo raiz, o `terraform init` tentava resolver `provider "render"`, `provider "vercel"` e `provider "neon"` no namespace padrão `hashicorp/*`.
 
 ### Changed
+- **`DomRock-Lana` (`app/core/config.py`, `.env.example`), `infra/terraform/` e `docs/infra/DEPLOY_GUIDE.md`**:
+  - Alterado o provedor LLM padrão da Lana de Google Gemini para **Groq** (`AI_PROVIDER=GROQ`, `AI_MODEL=llama-3.3-70b-versatile` via `langchain-groq` / `ChatGroq` e `GROQ_API_KEY`), mantendo suporte opcional de fallback para OpenRouter e Gemini via `AI_FALLBACKS`.
+  - Confirmado que `GROQ_API_KEY` já é repassada ao serviço `domrock-lana` no Terraform e no workflow `deploy-homolog.yml`, e que `lifecycle { ignore_changes = [maintenance_mode] }` já está aplicado nos recursos Render.
 - **`infra/terraform/` (`backend.tf`), `.github/workflows/deploy-homolog.yml` e `docs/infra/DEPLOY_GUIDE.md`**:
   - Removido o bloco `cloud` (HCP Terraform) e a dependência de `TF_API_TOKEN`, passando a usar o backend `local` do Terraform.
   - O workflow `deploy-homolog.yml` agora restaura e persiste o `terraform.tfstate` na branch dedicada e isolada `tfstate-homolog` usando apenas `GITHUB_TOKEN`.

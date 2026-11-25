@@ -21,12 +21,12 @@ variable "jwt_secret" {
 
 variable "ai_provider" {
   type    = string
-  default = "GEMINI"
+  default = "GROQ"
 }
 
 variable "ai_model" {
   type    = string
-  default = "gemini-2.5-flash-lite"
+  default = "llama-3.3-70b-versatile"
 }
 
 variable "gemini_api_key" {
