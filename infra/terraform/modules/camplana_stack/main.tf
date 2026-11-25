@@ -1,7 +1,7 @@
 locals {
   frontend_project_name = "domrock-frontend-${var.environment}"
   frontend_default_url  = "https://${local.frontend_project_name}.vercel.app"
-  cors_origins          = join(",", distinct(concat([local.frontend_default_url], var.extra_cors_origins)))
+  cors_origins          = join(",", distinct(concat(["https://camplana.vercel.app", local.frontend_default_url], var.extra_cors_origins)))
   otel_enabled          = trimspace(var.otel_exporter_otlp_endpoint) != "" ? "true" : "false"
 }
 

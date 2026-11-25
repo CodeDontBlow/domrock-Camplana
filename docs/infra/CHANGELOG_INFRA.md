@@ -5,6 +5,10 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
 ## [Unreleased]
 
 ### Fixed
+- **`DomRock-Frontend/vercel.json`, `infra/terraform/modules/camplana_stack/main.tf` e `DomRock-Backend` (CORS)**:
+  - Criado `DomRock-Frontend/vercel.json` com rewrite SPA (`/(.*) -> /index.html`) para evitar `404 NOT_FOUND` em rotas diretas como `/login` na Vercel.
+  - Adicionado `https://camplana.vercel.app` (junto de `https://domrock-frontend-homolog.vercel.app`) à lista padrão de `CORS_ALLOWED_ORIGINS` no módulo Terraform e no fallback do `DomRock-Backend`.
+  - Confirmado que `VITE_API_BASE_URL` (usada pelo Axios em `src/services/api.ts`) já está configurada em `vercel_project_environment_variable.vite_api_base_url` apontando para `render_web_service.backend.url`.
 - **`infra/terraform/` (`vercel_project.frontend`) e `.github/workflows/deploy-homolog.yml`**:
   - Adicionada a variável `github_owner` com padrão `"CodeDontBlow"` para o recurso `vercel_project.frontend` (alinhando o case retornado pela API da Vercel), mantendo `github_org = "codedontblow"` em minúsculo para as imagens OCI/Docker no `ghcr.io`.
   - Adicionado passo idempotente de `terraform import` no workflow `deploy-homolog.yml` caso `domrock-frontend-homolog` já exista na Vercel fora do state.
