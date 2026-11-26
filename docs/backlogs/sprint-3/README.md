@@ -32,6 +32,8 @@ Ao mesmo tempo, a apuração ainda não aplica todas as regras da especificaçã
 
 **Período:** 02/11/2026 a 23/11/2026, com 3 semanas, como as Sprints 1 (07/09 a 27/09) e 2 (05/10 a 26/10). A capacidade considera a velocidade das sprints anteriores e reserva tempo para os manuais e o vídeo da entrega final.
 
+**Resultado:** a meta foi cumprida e as extras também. Entraram todas as histórias da sprint (19, 20, 21, 9, 22 e 16) e a *Could* 25, somando 63 pontos. Detalhes em [backlog.md](backlog.md#sprint).
+
 ## 🔁 O que a review da Sprint 2 pediu <a id="review"></a>
 
 | Pedido do cliente | Como a Sprint 3 responde |
@@ -75,8 +77,8 @@ Todos os cenários estão em [gherkin.md](gherkin.md), escritos com os usuários
 | [19 — Auditor: negócio](gherkin.md#us19) | 9 | Só leitura com 403 nas rotas de escrita; versões comparadas; decisão com justificativa |
 | [20 — Auditor: técnica e alertas](gherkin.md#us20) | 10 | Injeção de prompt e de SQL bloqueadas e registradas; alerta trava a aprovação |
 | [21 — Apuração completa](gherkin.md#us21) | 11 | Uma regra por cenário (5a a 5g) com os exemplos da especificação |
-| [9 — Correção da base pela Lana](gherkin.md#us9) | 8 | Pedido pelo chat com antes e depois; quatro olhos; base alterada desde o pedido (409) |
-| [22 — Intercorrências pela Lana](gherkin.md#us22) | 6 | Cinco tipos de intercorrência; confirmação antes de submeter; datas inválidas recusadas |
+| [9 — Correção da base pela Lana](gherkin.md#us9) | 9 | Pedido pelo chat com antes e depois; quatro olhos; base alterada desde o pedido (409); Meus pedidos |
+| [22 — Intercorrências pela Lana](gherkin.md#us22) | 7 | Cinco tipos de intercorrência; confirmação antes de submeter; datas inválidas e matrícula inexistente recusadas |
 | [16 — Campanhas por período](gherkin.md#us16) | 4 | Classificação pela data de hoje |
 | [25 — Lana conversável](gherkin.md#us25) | 4 | Fallback sem chamar a LLM; limiar configurável |
 
@@ -120,11 +122,12 @@ Critérios utilizados para verificar se uma história foi desenvolvida, testada 
 - Alertas técnicos: tabela, rotas de abrir e resolver, e trava na decisão da versão (US 20).
 - Correção da base com aprovação de outra pessoa: PR da A6-80 com a migration renumerada (US 9 e T5).
 - Intercorrências com o mesmo fluxo de aprovação da correção da base (US 22).
+- Confirmação no chat do pedido montado pela Lana (`POST /api/chat/{chat_id}/correcoes`), que entra na fila como "Aberta pela Lana a pedido de" quem pediu (US 9 e 22).
 - Campanhas por período (US 16).
 
 ### Frontend (Vue 3, Vite, Pinia)
 - Tela "Auditoria" com abas de negócio (versões, decisões, conversa) e técnica (SQL, código, alertas) (US 19 e 20).
-- Pedidos de correção da base e de intercorrência na fila de Aprovações (US 9 e 22).
+- Cartão do pedido no chat, com Confirmar e Desistir, e a página **Solicitações**: fila do Supervisor para aprovar ou reprovar (com justificativa) os pedidos de outras pessoas e "Meus pedidos" para quem pediu acompanhar (US 9 e 22).
 - Item ativo da barra lateral de acordo com a rota, também depois do F5 (T8).
 - Abas realizadas, em andamento e previstas em "Campanhas" (US 16).
 
@@ -132,9 +135,10 @@ Critérios utilizados para verificar se uma história foi desenvolvida, testada 
 - Consultas bloqueadas pela checagem de SQL gravadas na trilha, com o motivo (US 20).
 - Análise do código Python gerado antes de executar (US 20).
 - Apuração com as regras 5a a 5g e as intercorrências, com o detalhamento por pessoa (US 21).
-- Pedido de correção da base e de intercorrência pelo chat, com confirmação antes de submeter (US 9 e 22).
+- Pedido de correção da base e de intercorrência pelo chat, com confirmação antes de submeter (US 9 e 22). As ferramentas conferem na base, com SQL fixo, o valor antes e a matrícula, e o código exige que o usuário tenha dito a competência.
 - Ferramenta de simulação dividida em partes menores (T4).
 - Spike de RAG: banco vetorial, limiar e fallback (T1).
+- Lana conversável: guardrail de escopo e busca nas regras com RAG (ChromaDB), integrados na `develop` (US 25, A6-128).
 
 ### Documentação
 - Manual de Instalação, Manual do Usuário (com o perfil Auditor) e vídeo tutorial final (T7).
@@ -165,14 +169,23 @@ Critérios utilizados para verificar se uma história foi desenvolvida, testada 
 
 <!-- Inserir o gráfico de burndown da Sprint 3 ao fim da sprint -->
 
-*A preencher ao fim da sprint: gráfico, período e pontos entregues.*
+**Período:** 02/11/2026 a 23/11/2026. **Pontos entregues:** 63 (Must 34, Should 21 e Could 8), com capacidade estimada de 40.
+
+*O gráfico de burndown do Jira entra aqui.*
 
 ## 🎥 Demonstração <a id="demo"></a>
 
 ### • SPRINT 3
 
-*A preencher com o vídeo da demonstração final.*
+- [Vídeo tutorial: incremento da Sprint 3](https://youtu.be/GkWMWjIWTaI): o fluxo completo, da Gerente ao Auditor, em cerca de 5 minutos.
+- [Correções da base e intercorrências pela Lana](https://youtu.be/Rg16uMSsVQw): o pedido no chat, a Lana barrando um dado errado, a aprovação e a reprovação em Solicitações e o acompanhamento em "Meus pedidos", em cerca de 3 minutos.
 
 ## 📋 Protótipo da Aplicação <a id="prototipo"></a>
 
-*A preencher com as telas novas da Sprint 3: Auditoria (negócio e técnica), alertas, intercorrências e campanhas por período.*
+As telas novas da Sprint 3 estão no [Figma da equipe](https://www.figma.com/design/1QCm9zkVkDi0ACpwtZ405Y/Untitled), página **Protótipo**:
+
+- Auditoria: visão de negócio, aba técnica e alertas (A6-125);
+- campanhas por período e quanto cada pessoa recebe na apuração (A6-127);
+- pedidos de correção da base e de intercorrência, no chat e em Solicitações (A6-126, em andamento).
+
+As telas como ficaram no sistema estão no [Manual do Usuário](../../guias/manual-usuario.md).

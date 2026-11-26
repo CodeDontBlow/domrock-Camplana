@@ -20,15 +20,15 @@ O **ID** de cada história é fixo e é o mesmo usado no Jira (`API-6SEM`). As h
 | 6 | Alta | Como Supervisor de Vendas, quero avaliar e aprovar ou reprovar com justificativa as regras de negócio criadas por outros usuários, para garantir que estejam alinhadas ao orçamento e aos objetivos da campanha antes de serem executadas. | 8 | 2 | ✅ |
 | 7 | Alta | Como Administrador do Sistema, quero criar, editar e desativar usuários, para gerenciar quem usa o sistema. | 3 | 2 | ✅ |
 | 8 | Alta | Como Gerente de Vendas, quero que o sistema disponha da base de vendas, metas e vendedores do período, para que a simulação tenha dados sobre os quais calcular. | 8 | 2 | ✅ |
-| 9 | Alta | Como Supervisor de Vendas, quero propor correções pontuais na base cadastral e submetê-las ao mesmo fluxo de aprovação, para manter a base íntegra caso haja necessidade. | 8 | 3 | 🔄 |
+| 9 | Alta | Como Supervisor de Vendas, quero propor correções pontuais na base cadastral e submetê-las ao mesmo fluxo de aprovação, para manter a base íntegra caso haja necessidade. | 8 | 3 | ✅ |
 | 10 | Média | Como Usuário Autenticado, quero ver o status da minha regra (rascunho, aguardando aprovação, aprovada, reprovada, arquivada), para acompanhar em que etapa ela está. | 5 | 2 | ✅ |
 | 15 | Alta | Como Supervisor de Vendas, quero visualizar o passo a passo de como o sistema interpretou o comando e chegou ao resultado da simulação, para entender e confiar na decisão (explicabilidade). | 13 | 2 | ✅ |
-| 16 | Média | Como Supervisor de Vendas, quero visualizar as campanhas já realizadas, em andamento e previstas, para gerenciá-las. | 5 | 3 | 🔄 |
-| **19** | Alta | Como Auditor, quero consultar, sem poder alterar, as campanhas, versões, conversas e decisões de todos os usuários, para auditar o negócio de ponta a ponta. | 8 | 3 | 🔄 |
-| **20** | Alta | Como Auditor, quero ver o SQL e o código gerados pela Lana e resolver os alertas de segurança, para que nenhuma campanha com código suspeito seja aprovada. | 13 | 3 | 🔄 |
-| **21** | Alta | Como Gerente de Vendas, quero que a apuração siga todas as regras da especificação e as intercorrências de RH, para que o simulado bata com o que a empresa pagaria. | 13 | 3 | 🔄 |
-| **22** | Alta | Como Gerente ou Supervisor de Vendas, quero registrar intercorrências de RH conversando com a Lana, com aprovação de outra pessoa, para que a apuração use a base certa. | 8 | 3 | 🔄 |
-| **25** | Média | Como Gerente de Vendas, quero conversar com a Lana sobre comissionamento e sobre o que ela sabe fazer, recebendo uma resposta clara quando o assunto estiver fora do que ela cobre, para usá-la como assistente e não só como formulário. | 8 | 3 | *Could* |
+| 16 | Média | Como Supervisor de Vendas, quero visualizar as campanhas já realizadas, em andamento e previstas, para gerenciá-las. | 5 | 3 | ✅ |
+| **19** | Alta | Como Auditor, quero consultar, sem poder alterar, as campanhas, versões, conversas e decisões de todos os usuários, para auditar o negócio de ponta a ponta. | 8 | 3 | ✅ |
+| **20** | Alta | Como Auditor, quero ver o SQL e o código gerados pela Lana e resolver os alertas de segurança, para que nenhuma campanha com código suspeito seja aprovada. | 13 | 3 | ✅ |
+| **21** | Alta | Como Gerente de Vendas, quero que a apuração siga todas as regras da especificação e as intercorrências de RH, para que o simulado bata com o que a empresa pagaria. | 13 | 3 | ✅ |
+| **22** | Alta | Como Gerente ou Supervisor de Vendas, quero registrar intercorrências de RH conversando com a Lana, com aprovação de outra pessoa, para que a apuração use a base certa. | 8 | 3 | ✅ |
+| **25** | Média | Como Gerente de Vendas, quero conversar com a Lana sobre comissionamento e sobre o que ela sabe fazer, recebendo uma resposta clara quando o assunto estiver fora do que ela cobre, para usá-la como assistente e não só como formulário. | 8 | 3 | ✅ |
 
 **Perfis:** o **Gerente de Vendas** propõe e simula campanhas e correções. O **Supervisor de Vendas** faz o mesmo e aprova o que **outra pessoa** submeteu. O **Auditor** (novo na Sprint 3) vê tudo e não altera nada; a única ação dele é abrir ou resolver um alerta técnico. O **Administrador** só gerencia usuários.
 
@@ -48,6 +48,8 @@ O **ID** de cada história é fixo e é o mesmo usado no Jira (`API-6SEM`). As h
 
 **Must: 34 pontos · Should: 21 pontos · Could: 8 pontos.**
 
+**Resultado (26/11/2026):** todas as histórias da sprint foram entregues, inclusive a *Could* 25: 63 pontos, acima da capacidade estimada de 40. As histórias 9 e 22 fecham com os PRs do backend (#15), da Lana (#16) e do front (#12), que mudam o contrato gRPC e são mesclados juntos.
+
 ### Tarefas técnicas (sem pontos de história, com capacidade reservada)
 
 | ID | Jira | Tarefa | Frente | Por quê |
@@ -60,6 +62,8 @@ O **ID** de cada história é fixo e é o mesmo usado no Jira (`API-6SEM`). As h
 | T6 | A6-120 | Cores verde e laranja para mensagens rápidas de sucesso, mantendo-as como temas selecionáveis (talvez um segundo tom de laranja no tema laranja) | Front | Ajuste visual pedido pelo time (Could) |
 | T7 | A6-121 | Manual de Instalação, Manual do Usuário e vídeo tutorial finais | Docs | Requisitos da Fatec e do parceiro para a entrega final |
 | T8 | A6-123 | **Correção de bug:** a barra lateral marca "Nova Campanha" como ativo em Vigente, Relatórios, Importar base e Configurações quando a página é aberta pelo endereço ou recarregada (F5) | Front | O `watch` da rota em `Sidebar.vue` só trata `/campanha`, `/admin` e `/` |
+
+As tarefas T1 a T8 foram concluídas, inclusive a T6 (*Could*). A integração do RAG do spike T1 na `develop` seguiu na A6-128.
 
 ---
 

@@ -6,7 +6,7 @@ O **Camplana** ajuda a Dom Rock a planejar campanhas de comissionamento antes de
 
 Este manual vale para a versão do fim da Sprint 3 e está organizado por perfil. Para instalar o sistema, veja o [Manual de Instalação](manual-instalacao.md).
 
-Prefere ver funcionando? O [vídeo tutorial](https://youtu.be/GkWMWjIWTaI) mostra o fluxo completo da Sprint 3, da Gerente ao Auditor, em cerca de 5 minutos.
+Prefere ver funcionando? O [vídeo tutorial](https://youtu.be/GkWMWjIWTaI) mostra o fluxo completo da Sprint 3, da Gerente ao Auditor, em cerca de 5 minutos. Os pedidos de correção da base e de intercorrência pela Lana, com a aprovação em **Solicitações**, estão [neste outro vídeo](https://youtu.be/Rg16uMSsVQw), de cerca de 3 minutos.
 
 ---
 
@@ -26,8 +26,8 @@ Prefere ver funcionando? O [vídeo tutorial](https://youtu.be/GkWMWjIWTaI) mostr
 
 | Perfil | O que pode fazer | Tela inicial |
 |---|---|---|
-| **Gerente de Vendas** | Criar campanhas conversando com a Lana, simular, publicar para aprovação e acompanhar as próprias campanhas | Nova Campanha (chat) |
-| **Supervisor de Vendas** | Tudo da Gerente, mais aprovar ou devolver campanhas de outras pessoas e importar a base mensal | Nova Campanha (chat) |
+| **Gerente de Vendas** | Criar campanhas conversando com a Lana, simular, publicar para aprovação e acompanhar as próprias campanhas; pedir à Lana correções da base e intercorrências de RH | Nova Campanha (chat) |
+| **Supervisor de Vendas** | Tudo da Gerente, mais aprovar ou devolver campanhas de outras pessoas, decidir os pedidos de correção e de intercorrência de outras pessoas e importar a base mensal | Nova Campanha (chat) |
 | **Auditor** | Consultar, sem alterar, as campanhas, versões, conversas e decisões de todos; ver o SQL e o código gerados; abrir e resolver alertas técnicos | Auditoria |
 | **Administrador** | Só a gestão de usuários. Não vê campanhas nem simulações | Usuários |
 
@@ -137,11 +137,38 @@ Se o Supervisor devolver a campanha, o comentário dele aparece no chat. Continu
 
 ![Eventos da campanha no chat](imagens/manual-usuario/gerente-08-eventos-no-chat.png)
 
+### 2.10 Pedir uma correção da base ou uma intercorrência pela Lana (novidade da Sprint 3)
+
+Quando um dado da base estiver errado, ou houver uma intercorrência de RH, peça no próprio chat, em linguagem natural. Não há formulário.
+
+- **Correção da base:** transferência de loja, troca de cargo, data de admissão ou data de demissão. Diga a matrícula, o valor novo, o mês e o ano em que a correção vale (a competência) e o motivo. O valor atual é opcional: a Lana busca na base. Ex.: "A MATRIC-38 foi transferida da loja 33 para a loja 8 em outubro de 2025; foi transferência a pedido da regional."
+- **Intercorrência de RH:** férias, afastamento, licença-maternidade, cobertura de loja ou demissão. Diga a matrícula, o período (a demissão tem uma data só), o motivo e, na cobertura, a loja. Ex.: "A MATRIC-12 vai tirar férias de 01/12/2025 a 15/12/2025, férias programadas."
+
+Antes de montar o pedido, a Lana confere os dados na base:
+
+- se o valor atual que você informou não bater com a base, ela avisa qual é o valor certo e não abre o pedido;
+- se você não disser o mês, ela pergunta a competência antes de abrir;
+- se a matrícula não existir, ou a data final vier antes da inicial, ela recusa;
+- se o pedido for, na verdade, uma mudança de % de comissão, ela explica que isso é uma campanha.
+
+Com tudo certo, a Lana mostra um **cartão** com o tipo, a matrícula, o valor anterior e o novo (ou o período, na intercorrência), a competência e o motivo. Você pode alterar o motivo no próprio cartão.
+
+![Cartão do pedido de correção no chat](imagens/manual-usuario/gerente-09-cartao-pedido.png)
+
+- **Confirmar** envia o pedido para a fila de Solicitações como **Pendente**. A base **não** muda ainda: ela só muda quando outra pessoa aprovar.
+- **Desistir** descarta o cartão, e nenhum pedido é criado.
+
+### 2.11 Acompanhar os pedidos (novidade da Sprint 3)
+
+No menu **Solicitações**, a seção **Meus pedidos** lista os pedidos que você abriu, com motivo, tipo, competência, matrícula, status (**Pendente**, **Aprovado** ou **Reprovado**) e a justificativa de quem reprovou. As abas **Correção da Base** e **Abertura de Intercorrência** separam os dois tipos. Clique num pedido para ver os detalhes.
+
+![Meus pedidos em Solicitações](imagens/manual-usuario/gerente-10-meus-pedidos.png)
+
 ---
 
 ## 3. Supervisor de Vendas
 
-O Supervisor faz tudo o que a Gerente faz (seção 2) e também decide sobre as campanhas e importa a base mensal.
+O Supervisor faz tudo o que a Gerente faz (seção 2) e também decide sobre as campanhas e os pedidos de correção e de intercorrência, e importa a base mensal.
 
 ### 3.1 Fila de aprovação
 
@@ -186,6 +213,21 @@ No menu **Importar base**:
    - **impeditiva:** nada é gravado. Corrija a planilha e envie de novo.
 
 ![Importar base do mês](imagens/manual-usuario/supervisor-04-importar.png)
+
+### 3.5 Decidir pedidos de correção e de intercorrência (novidade da Sprint 3)
+
+No menu **Solicitações**, escolha a aba **Correção da Base** ou **Abertura de Intercorrência**. A fila mostra um cartão por pedido pendente de **outras pessoas**, com o tipo, a competência, a matrícula, o motivo, o valor anterior e o novo, e quem abriu. Pedidos feitos pelo chat trazem a marca **"Aberta pela Lana a pedido de"** e o nome de quem pediu. Use as setas para passar de um pedido para outro.
+
+![Fila de Solicitações do Supervisor](imagens/manual-usuario/supervisor-05-solicitacoes.png)
+
+Clique num cartão para abrir os detalhes e decidir:
+
+- **Aprovar:** a correção é aplicada na base na mesma hora (a intercorrência passa a valer na apuração), e o pedido fica **Aprovado**;
+- **Reprovar:** escreva a justificativa (obrigatória) e confirme. A base não muda, e quem pediu vê a justificativa em **Meus pedidos**.
+
+![Detalhes do pedido com Aprovar e Reprovar](imagens/manual-usuario/supervisor-06-decidir-pedido.png)
+
+A decisão é sempre de **outra pessoa**: o Supervisor não decide um pedido que ele mesmo abriu. Se a base mudou depois do pedido (por exemplo, outra correção já moveu a matrícula de loja), a aprovação é recusada com o aviso "A base mudou desde o pedido".
 
 ---
 
@@ -282,11 +324,8 @@ Cada publicação congela uma **versão** com os parâmetros, o resultado e a co
 
 ## 7. Em desenvolvimento
 
-Estes itens da Sprint 3 ainda não estão na versão descrita neste manual:
+Este item ainda não está na versão descrita neste manual:
 
-- pedir a correção da base cadastral pela conversa com a Lana (A6-81);
-- a fila de **Solicitações**, onde ficam os pedidos de correção da base e de intercorrência para aprovação (A6-112). Hoje o menu **Solicitações** abre uma página vazia;
-- registrar intercorrências de RH pela conversa com a Lana (A6-124);
 - escolher o perfil **Auditor** ao cadastrar um usuário. Por enquanto, o único Auditor é o Paulo, criado pela migration V12.
 
-Enquanto isso, as intercorrências de RH da demonstração entram pela carga do `seed-demo.sh` (veja o Manual de Instalação).
+Além das intercorrências pedidas pela Lana (seção 2.10), as da demonstração também entram pela carga do `seed-demo.sh` (veja o Manual de Instalação).

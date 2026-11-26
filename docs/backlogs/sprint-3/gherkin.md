@@ -303,8 +303,9 @@ Funcionalidade: Apuração completa da comissão
 - O pedido é feito no chat. A Lana confere a matrícula na base e mostra o valor antes, o valor depois, o mês e o motivo para o usuário confirmar antes de submeter.
 - A Lana não altera a base: ela só cria o pedido. A base muda quando outra pessoa aprova.
 - Dá para corrigir loja, cargo, data de admissão e data de demissão.
-- Todo pedido nasce "Pendente" e só vale depois de aprovado por **outra pessoa** (Supervisor), na fila de Aprovações.
+- Todo pedido nasce "Pendente" e só vale depois de aprovado por **outra pessoa** (Supervisor), no menu **Solicitações**.
 - Se a base mudou desde o pedido, a aprovação é recusada (409).
+- O autor acompanha o pedido em **Meus pedidos**, no menu Solicitações, com o status e a justificativa da decisão.
 
 ```gherkin
 # language: pt
@@ -318,7 +319,7 @@ Funcionalidade: Correção da base pela Lana
 
   Cenário: Outro Supervisor aprova e a base muda
     Dado que existe o pedido pendente do Sérgio para mover a MATRIC-38 para a loja 8
-    Quando a Silvia aprova o pedido na fila de Aprovações
+    Quando a Silvia aprova o pedido em Solicitações
     Então em out/2025 a MATRIC-38 passa a pertencer à loja 8
     E o pedido fica "Aprovado" com a aprovadora e a data
 
@@ -353,6 +354,11 @@ Funcionalidade: Correção da base pela Lana
     Quando a Silvia tenta reprová-lo sem justificativa
     Então o sistema recusa e pede a justificativa
     E a base não é alterada
+
+  Cenário: Autor acompanha o pedido em Meus pedidos
+    Dado que a Silvia reprovou o pedido do Sérgio com a justificativa "A transferência só vale em novembro"
+    Quando o Sérgio abre o menu Solicitações
+    Então "Meus pedidos" mostra o pedido como "Reprovado" com essa justificativa
 ```
 
 ---
@@ -362,10 +368,10 @@ Funcionalidade: Correção da base pela Lana
 > Como Gerente ou Supervisor de Vendas, quero registrar intercorrências de RH conversando com a Lana, com aprovação de outra pessoa, para que a apuração use a base certa.
 
 **Regras**
-- O pedido é feito no chat. A Lana extrai o tipo, a matrícula, o período e o motivo (e a loja, na cobertura) e mostra tudo para o usuário confirmar antes de submeter.
+- O pedido é feito no chat. A Lana extrai o tipo, a matrícula, o período e o motivo (e a loja, na cobertura), confere que a matrícula existe na base e mostra tudo para o usuário confirmar antes de submeter.
 - A Lana não altera a base: ela só cria o pedido.
 - Tipos de intercorrência: `afastamento`, `ferias`, `licenca_maternidade`, `cobertura_loja` e `demissao`.
-- Usa o mesmo fluxo de aprovação da correção da base (US 9): o pedido nasce "Pendente" e só vale depois de aprovado por **outra pessoa** (Supervisor), na fila de Aprovações.
+- Usa o mesmo fluxo de aprovação da correção da base (US 9): o pedido nasce "Pendente" e só vale depois de aprovado por **outra pessoa** (Supervisor), no menu **Solicitações**.
 
 ```gherkin
 # language: pt
@@ -376,7 +382,7 @@ Funcionalidade: Intercorrências de RH pela Lana
     Quando ela pede à Lana para registrar "<tipo>" para a "<matricula>" de "<inicio>" a "<fim>"
     Então a Lana mostra o tipo, a matrícula e o período para ela confirmar
     E, depois que ela confirma, o registro nasce "Pendente"
-    E aparece na fila de Aprovações do Supervisor
+    E aparece na fila do Supervisor, no menu Solicitações
 
     Exemplos:
       | tipo                 | matricula | inicio     | fim        |
@@ -388,7 +394,7 @@ Funcionalidade: Intercorrências de RH pela Lana
 
   Cenário: Supervisor aprova e a intercorrência passa a valer
     Dado que existe o pedido pendente de férias da MATRIC-42 de 01/10/2025 a 10/10/2025
-    Quando o Sérgio aprova o pedido na fila de Aprovações
+    Quando o Sérgio aprova o pedido em Solicitações
     Então as férias passam a valer para a apuração
     E o pedido fica "Aprovado" com o aprovador e a data
 
@@ -411,6 +417,11 @@ Funcionalidade: Intercorrências de RH pela Lana
     Dado que o Sérgio registrou um afastamento pela Lana
     Quando o próprio Sérgio tenta aprová-lo
     Então a resposta é 403 com a mensagem "Outra pessoa precisa aprovar esta correção"
+
+  Cenário: Matrícula que não existe na base
+    Quando a Gabriela pede à Lana férias para a MATRIC-9999 de 01/12/2025 a 15/12/2025
+    Então a Lana avisa que a matrícula MATRIC-9999 não existe na base
+    E nenhum pedido é criado
 ```
 
 ---
