@@ -51,6 +51,7 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
   - Envolvidos a criação, `ALTER ROLE` e `GRANT` da role `lana_leitura` em blocos `DO $$ ... EXCEPTION WHEN insufficient_privilege ... END $$;`.
   - **Por quê:** garantir idempotência e evitar falha de migração do Flyway em bancos PostgreSQL gerenciados (Neon/Supabase) onde o usuário da aplicação não possui privilégio `CREATEROLE`.
 - **`DomRock-Backend/Dockerfile`**:
+  - Alterada a imagem do estágio `build` para `maven:3.9.9-eclipse-temurin-17` e substituído `./mvnw` por `mvn` nos comandos `RUN` (evitando download externo do Maven Wrapper durante o build).
   - Alterado o `ENTRYPOINT` de `["java", "-jar", "app.jar"]` para `["sh", "-c", "java $JAVA_OPTS -jar app.jar"]`.
   - **Por quê:** permitir a injeção dinâmica de flags da JVM (como `-Xmx320m -Xms128m` ou `-XX:MaxRAMPercentage=70.0`) em ambiente de homologação com limite de 512 MB RAM (Render Free) sem necessidade de rebuild da imagem. Mantido o usuário não-root `spring`.
 - **`DomRock-Lana/Dockerfile`**:
