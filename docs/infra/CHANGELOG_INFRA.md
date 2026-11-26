@@ -5,6 +5,9 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
 ## [Unreleased]
 
 ### Fixed
+- **`DomRock-Backend` (`GlobalExceptionHandler.java`, `LanaClient.java`)**:
+  - Adicionado `@ExceptionHandler(Exception.class)` no `GlobalExceptionHandler` logando o stack trace completo (`log.error("Erro no {}", req.getRequestURI(), ex)`) e expondo `ex.getClass().getSimpleName() + ": " + ex.getMessage()` fora do profile `prod`.
+  - Normalizada a `lanaUrl` em `LanaClient` removendo barras finais (`/+$`) antes de concatenar `/agent/invoke`, evitando barra dupla (`//agent/invoke`).
 - **`DomRock-Backend` (`V11__seed_homolog_demo.sql`, `application.properties`)**:
   - Separados os `INSERT INTO mensagem_chat ... RETURNING id INTO v_msg_id` multi-linha em inserções individuais de linha única, adicionado `ORDER BY id ASC LIMIT 1` nos `SELECT id INTO` de usuários e incluído bloco `EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Seed V11 warning: %', SQLERRM;` ao final do `DO $seed$` para blindar o startup do Spring Boot.
   - Explicitado `spring.flyway.clean-disabled=true` em `application.properties`.
