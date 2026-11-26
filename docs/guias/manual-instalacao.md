@@ -4,6 +4,8 @@ Este manual sobe a stack completa do Camplana (PostgreSQL, backend Spring Boot, 
 
 > **Testado do zero em 25/11/2026:** clone novo deste repositório, submódulos na `develop`, volumes do Docker vazios, Linux (Debian 13) com Docker Engine 29 e Compose v2. As 14 migrations subiram sem erro e o `seed-demo.sh` terminou em cerca de 3 minutos.
 
+> **Atalho para a apresentação:** com o `.env` configurado (seção 4), `./scripts/start-demo.sh` faz as seções 5 e 6 de uma vez: sobe os containers, espera o backend e a Lana, carrega a base e os pedidos de exemplo em Solicitações e testa uma resposta da Lana. `--reset` recomeça do zero. Veja [Demo da Sprint 3 em um comando](../../README.md#-demo-da-sprint-3-em-um-comando).
+
 ---
 
 ## 1. Visão geral

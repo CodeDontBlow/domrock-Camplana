@@ -193,9 +193,55 @@ O backend é a porta de entrada única da aplicação e exige autenticação via
 
 - Git;
 - Docker com Compose v2;
-- Uma chave de API do Gemini (ou do OpenRouter) para a Lana.
+- Uma chave de API (Gemini, OpenRouter ou Groq) para a Lana.
 
 Não é preciso instalar Java, Node ou Python: tudo roda em containers.
+
+## 🚀 Demo da Sprint 3 em um comando
+
+Para apresentar a Sprint 3 com ambiente pronto, banco populado e sementes preparadas:
+
+```bash
+git clone --recurse-submodules https://github.com/codedontblow/domrock-camplana
+cd domrock-camplana
+cp .env.example .env    # preencha AI_PROVIDER, AI_MODEL e a chave
+./scripts/start-demo.sh
+```
+
+### O que o script faz
+1. **Pré-requisitos:** confere `git`, `docker`, `docker compose` (v2), `curl`, `python3` e o serviço Docker ativo.
+2. **Submódulos:** inicializa submódulos vazios (`DomRock-Backend`, `DomRock-Frontend`, `DomRock-Lana`) nas versões fixadas.
+3. **Ambiente:** valida variáveis do `.env` (`AI_PROVIDER`, `AI_MODEL` e a chave de API correspondente).
+4. **Portas:** verifica disponibilidade das portas do host (`5173`, `8080`, `8000`, `50051`, `5432`) sem colidir com outros serviços.
+5. **Containers:** sobe os serviços via `docker compose up -d --build`.
+6. **Prontidão:** aguarda a inicialização do Backend, Lana e Frontend com limites de tempo e diagnósticos claros.
+7. **Carga de dados e seeds:** importa o dataset e intercorrências (se base vazia) e aplica `seed-demo.sql` e `seed-demo-solicitacoes.sql`.
+8. **Conferência final:** valida autenticação dos usuários (`gabriela`, `sergio`, `ana`, `paulo`), fila de correções e chamada real à Lana.
+
+- **Tempo estimado:** numa máquina nova, de 10 a 15 minutos (download das imagens, dependências do Maven, do pip e do npm, modelo de embedding da Lana e importação das bases). Com o build em cache, cerca de 3 minutos com `--reset` e segundos sem ele.
+- **Rode no dia anterior** na máquina da apresentação: o build precisa de internet. No dia, a internet só é usada pela IA. Se a IA falhar na hora, a fila do Sérgio já tem 2 pedidos de exemplo (plano B).
+- **Opções disponíveis:**
+  - `--reset`: reinicia o banco da demo do zero (solicita confirmação antes de executar `docker compose down -v`).
+  - `--sem-teste-lana`: pula o teste de invocação em tempo real do agente Lana na etapa de conferência final.
+
+### 3 Problemas mais prováveis e soluções
+1. **Porta já em uso no host:** o script identifica a porta em conflito e indica o que fazer. Basta alterar a porta no `.env` (ex.: `POSTGRES_HOST_PORT=5433`, `BACKEND_HOST_PORT=8081`, `LANA_HOST_PORT=8001`, `LANA_GRPC_HOST_PORT=50052`, `FRONTEND_HOST_PORT=5174`) e executar `./scripts/start-demo.sh` novamente. Também dá para passar só na linha de comando, sem editar o `.env`: `POSTGRES_HOST_PORT=5433 ./scripts/start-demo.sh`.
+2. **Cota da IA estourada (HTTP 429) ou chave inválida:** o script emite aviso destacado sem interromper os serviços. No `.env`, altere o provedor/modelo (ex.: `AI_PROVIDER=GROQ` com `GROQ_API_KEY`) ou configure modelos de reserva em `AI_FALLBACKS`.
+3. **Docker inativo ou sem permissão:** certifique-se de que o daemon do Docker está rodando (`sudo systemctl start docker` ou Docker Desktop) e que seu usuário possui permissões para executar comandos Docker (`sudo usermod -aG docker $USER`).
+
+### Roteiro da Demo da Sprint 3
+- **1. Gabriela pede no chat (GERENTE - `gabriela@camplana.com.br` / `123456`):**
+  - Solicita correção cadastral: *"A MATRIC-38 foi transferida da loja 33 para a loja 8 em outubro de 2025; foi transferência a pedido da regional"*.
+  - Solicita intercorrência de RH: *"A MATRIC-12 vai tirar férias de 01/12/2025 a 15/12/2025, férias programadas"*.
+  - Revisa o cartão gerado pela Lana e clica em **Confirmar**.
+- **2. Sérgio avalia na fila (SUPERVISOR - `sergio@camplana.com.br` / `123456`):**
+  - Abre **Solicitações** (`/solicitacoes`), visualiza os pedidos com a indicação *"aberta pela Lana a pedido de Gabriela"*.
+  - Tenta reprovar sem justificativa para demonstrar a validação de justificativa obrigatória; em seguida, reprova preenchendo a justificativa.
+  - Aprova o outro pedido e confira a aplicação da alteração na base.
+- **3. Gabriela confere o status:**
+  - Em **Meus pedidos**, confere o andamento das solicitações aprovada e reprovada.
+
+---
 
 ### 1. Clonar com os submódulos
 
@@ -215,12 +261,12 @@ cp .env.example .env
 
 | Variável | Exemplo | Para quê |
 | --- | --- | --- |
-| `AI_PROVIDER` | `GEMINI` | `GEMINI` ou `OPENROUTER` |
+| `AI_PROVIDER` | `GEMINI` | `GEMINI`, `OPENROUTER` ou `GROQ` |
 | `AI_MODEL` | `gemini-3.5-flash-lite` | Modelo usado pela Lana |
 | `GEMINI_API_KEY` | `...` | Chave do provedor escolhido |
 | `OPENROUTER_API_KEY` / `GROQ_API_KEY` | `...` | Chaves dos provedores de reserva (opcionais) |
 | `AI_FALLBACKS` | `GEMINI:gemini-3.1-flash-lite,GROQ:openai/gpt-oss-120b` | Reserva em ordem se o principal falhar (cota 429, fora do ar). Provedor sem chave é ignorado |
-| `AI_TIMEOUT_S` | `30` | Segundos por modelo antes de passar ao próximo |
+| `AI_TIMEOUT_S` | `100` | Segundos por modelo antes de passar ao próximo (gRPC do chat corta em 100s) |
 | `DB_USERNAME` / `DB_PASSWORD` | `postgres` / `postgres` | Banco local |
 | `LANA_DB_PASSWORD` | `lana_leitura` | Senha do papel somente leitura da Lana (criado pelo Flyway) |
 | `JWT_SECRET` | `camplana-segredo-jwt-desenvolvimento-sprint-2-2026` | Chave secreta para assinatura dos tokens JWT da API |
@@ -302,6 +348,7 @@ Toda a documentação complementar do projeto permanece versionada no diretório
 - [Manual do Usuário](docs/guias/manual-usuario.md)
 - [Manual de Instalação](docs/guias/manual-instalacao.md)
 - [Vídeo tutorial: incremento da Sprint 3](https://youtu.be/GkWMWjIWTaI)
+- [Vídeo: correções e intercorrências pela Lana, com aprovação na fila (Sprint 3)](https://youtu.be/Rg16uMSsVQw)
 - [Roteiro de Review da Sprint 2](docs/guias/roteiro-review-sprint-2.md)
 
 ---
