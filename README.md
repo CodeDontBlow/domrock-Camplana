@@ -348,6 +348,7 @@ Toda a documentação complementar do projeto permanece versionada no diretório
 - [Manual do Usuário](docs/guias/manual-usuario.md)
 - [Manual de Instalação](docs/guias/manual-instalacao.md)
 - [Vídeo tutorial: incremento da Sprint 3](https://youtu.be/GkWMWjIWTaI)
+- [Vídeo: correções e intercorrências pela Lana, com aprovação na fila (Sprint 3)](https://youtu.be/Rg16uMSsVQw)
 - [Roteiro de Review da Sprint 2](docs/guias/roteiro-review-sprint-2.md)
 
 ---
