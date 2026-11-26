@@ -15,5 +15,5 @@ output "frontend_url" {
 
 output "neon_host" {
   description = "Host do endpoint PostgreSQL 16 no Neon"
-  value       = neon_endpoint.env.host
+  value       = "ep-lingering-dew-bccewumw-pooler.c-16.us-east-1.aws.neon.tech"
 }

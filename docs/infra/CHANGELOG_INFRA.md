@@ -30,6 +30,10 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
   - **Por quê:** sem `required_providers` no módulo raiz, o `terraform init` tentava resolver `provider "render"`, `provider "vercel"` e `provider "neon"` no namespace padrão `hashicorp/*`.
 
 ### Changed
+- **`infra/terraform/modules/camplana_stack/{main.tf,outputs.tf}` e `.github/workflows/deploy-homolog.yml` (Sincronização Neon `neondb_owner` / `neondb`)**:
+  - Removidos os recursos `neon_branch.env`, `neon_endpoint.env`, `neon_role.owner` e `neon_database.this` do módulo Terraform para não recriar/destruir a branch gerenciada manualmente no Neon.
+  - Configurados `render_env_group.backend_env` e `render_env_group.lana_env` para apontar para o host `ep-lingering-dew-bccewumw-pooler.c-16.us-east-1.aws.neon.tech`, banco `neondb`, usuário `neondb_owner` e senha `var.lana_db_password`.
+  - Adicionado `terraform state rm` temporário em `deploy-homolog.yml` para remover os recursos filhos órfãos do state.
 - **`DomRock-Lana` (`app/core/config.py`, `.env.example`), `infra/terraform/` e `docs/infra/DEPLOY_GUIDE.md`**:
   - Alterado o provedor LLM padrão da Lana de Google Gemini para **Groq** (`AI_PROVIDER=GROQ`, `AI_MODEL=llama-3.3-70b-versatile` via `langchain-groq` / `ChatGroq` e `GROQ_API_KEY`), mantendo suporte opcional de fallback para OpenRouter e Gemini via `AI_FALLBACKS`.
   - Confirmado que `GROQ_API_KEY` já é repassada ao serviço `domrock-lana` no Terraform e no workflow `deploy-homolog.yml`, e que `lifecycle { ignore_changes = [maintenance_mode] }` já está aplicado nos recursos Render.
@@ -56,6 +60,8 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
   - **Por quê:** eliminar a execução como `root` dentro do container da IA, seguindo o princípio do menor privilégio e alinhando ao padrão já adotado no `DomRock-Backend`.
 
 ### Added
+- **`DomRock-Backend` (`V11__seed_homolog_demo.sql`)**:
+  - Criada migration Flyway idempotente (`V11__seed_homolog_demo.sql`) populando o ambiente `homolog` com 6 campanhas em todos os status (`RASCUNHO`, `AGUARDANDO_APROVACAO`, `APROVADA`, `REPROVADA`, `ARQUIVADA`), 8 simulações com blocos de orçamento/meta/impacto, versões congeladas (`campanha_versao`), logs de auditoria (`campanha_status_log`) e histórico de conversas (`mensagem_chat`).
 - **`DomRock-Lana` (`requirements.txt`, `app/core/observability.py`, `main.py`, `app/agent/service.py`)**:
   - Adicionados `langfuse` e pacotes OpenTelemetry (`opentelemetry-api`, `opentelemetry-sdk`, `opentelemetry-exporter-otlp-proto-http`, `opentelemetry-instrumentation-fastapi`).
   - Instrumentação OTLP HTTP ativada apenas se `OTEL_EXPORTER_OTLP_ENDPOINT` estiver definida; callback do Langfuse ativado apenas se `LANGFUSE_PUBLIC_KEY` e `LANGFUSE_SECRET_KEY` estiverem definidas.

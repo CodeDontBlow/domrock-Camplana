@@ -5,53 +5,13 @@ locals {
   otel_enabled          = trimspace(var.otel_exporter_otlp_endpoint) != "" ? "true" : "false"
 }
 
-# 1. PostgreSQL 16 gerenciado no Neon.tech
+# 1. PostgreSQL 16 gerenciado no Neon.tech (branch/banco gerenciados externamente no painel)
 resource "neon_project" "this" {
   name                      = "camplana-${var.environment}"
   org_id                    = var.neon_org_id
   pg_version                = 16
   region_id                 = var.neon_region_id
   history_retention_seconds = 21600
-}
-
-resource "neon_branch" "env" {
-  project_id = neon_project.this.id
-  name       = var.environment
-
-  lifecycle {
-    replace_triggered_by = [neon_project.this.id]
-  }
-}
-
-resource "neon_endpoint" "env" {
-  project_id = neon_project.this.id
-  branch_id  = neon_branch.env.id
-  type       = "read_write"
-
-  lifecycle {
-    replace_triggered_by = [neon_project.this.id]
-  }
-}
-
-resource "neon_role" "owner" {
-  project_id = neon_project.this.id
-  branch_id  = neon_branch.env.id
-  name       = "camplana_app"
-
-  lifecycle {
-    replace_triggered_by = [neon_project.this.id]
-  }
-}
-
-resource "neon_database" "this" {
-  project_id = neon_project.this.id
-  branch_id  = neon_branch.env.id
-  name       = var.db_name
-  owner_name = neon_role.owner.name
-
-  lifecycle {
-    replace_triggered_by = [neon_project.this.id]
-  }
 }
 
 # 2. Motor de IA (DomRock-Lana) no Render Free
@@ -80,7 +40,7 @@ resource "render_env_group" "lana_env" {
   env_vars = {
     PORT = { value = "8000" }
     DATABASE_URL = {
-      value = "postgresql://lana_leitura:${var.lana_db_password}@${neon_endpoint.env.host}:5432/${neon_database.this.name}?sslmode=require"
+      value = "postgresql://neondb_owner:${var.lana_db_password}@ep-lingering-dew-bccewumw-pooler.c-16.us-east-1.aws.neon.tech/neondb?sslmode=require"
     }
     AI_PROVIDER                 = { value = var.ai_provider }
     AI_MODEL                    = { value = var.ai_model }
@@ -130,9 +90,9 @@ resource "render_env_group" "backend_env" {
     LANA_URL                    = { value = render_web_service.lana.url }
     GRPC_LANA_HOST              = { value = "localhost" }
     GRPC_LANA_PORT              = { value = "50051" }
-    DB_URL                      = { value = "jdbc:postgresql://${neon_endpoint.env.host}:5432/${neon_database.this.name}?sslmode=require" }
-    DB_USERNAME                 = { value = neon_role.owner.name }
-    DB_PASSWORD                 = { value = neon_role.owner.password }
+    DB_URL                      = { value = "jdbc:postgresql://ep-lingering-dew-bccewumw-pooler.c-16.us-east-1.aws.neon.tech/neondb?sslmode=require" }
+    DB_USERNAME                 = { value = "neondb_owner" }
+    DB_PASSWORD                 = { value = var.lana_db_password }
     LANA_DB_PASSWORD            = { value = var.lana_db_password }
     JWT_SECRET                  = { value = var.jwt_secret }
     CORS_ALLOWED_ORIGINS        = { value = local.cors_origins }
