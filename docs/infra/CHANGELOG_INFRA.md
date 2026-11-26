@@ -5,6 +5,9 @@ Todas as alterações notáveis de infraestrutura, containers e orquestração s
 ## [Unreleased]
 
 ### Fixed
+- **`DomRock-Backend` (`V11__seed_homolog_demo.sql`)**:
+  - Separados os `INSERT INTO mensagem_chat ... RETURNING id INTO v_msg_id` multi-linha em inserções individuais de linha única e adicionado `ORDER BY id ASC LIMIT 1` nos `SELECT id INTO` de usuários.
+  - **Por quê:** em PL/pgSQL, um `INSERT` multi-linha com `RETURNING id INTO <variável escalar>` falha com `ERROR: query returned more than one row`.
 - **`infra/terraform/modules/camplana_stack/main.tf` e `.github/workflows/deploy-homolog.yml` (Render Free Tier `env_vars` + `maintenance_mode`)**:
   - Movidas as variáveis de ambiente inline de `render_web_service.lana` e `render_web_service.backend` para os recursos dedicados `render_env_group.lana_env` e `render_env_group.backend_env`, vinculados via recursos `render_env_group_link.lana` e `render_env_group_link.backend`.
   - Alterado o lifecycle de ambos os `render_web_service` para `ignore_changes = all`, evitando que o provider `render-oss/render` envie `PATCH` com `maintenance_mode` em serviços Free Tier ao atualizar variáveis de ambiente.
